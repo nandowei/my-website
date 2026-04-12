@@ -4,7 +4,12 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(cp /Users/fernandodelgado/Desktop/Claude/my-website/index.html /tmp/mysite/)",
       "Bash(cp /Users/fernandodelgado/Desktop/Claude/my-website/style.css /tmp/mysite/)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(cp -r /Users/fernandodelgado/Desktop/Claude/my-website/photos /tmp/mysite/)"
     ]
   }
 }
