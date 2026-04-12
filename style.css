@@ -1,0 +1,842 @@
+/* ================================================================
+   CSS CUSTOM PROPERTIES
+   Edit these variables to restyle the entire site in one place.
+   ================================================================ */
+:root {
+  /* ── Palette: Light Mode ───────────────────────────────────────
+     Think aged paper, warm ivory, sepia ink.                      */
+  --clr-bg:         #faf9f6;   /* Page background — warm white      */
+  --clr-surface:    #f2efe8;   /* Cards, sidebar fill               */
+  --clr-hover:      #e8e4d9;   /* Hover state backgrounds           */
+  --clr-border:     #ddd8cc;   /* Lines, dividers, card borders     */
+  --clr-text:       #38322c;   /* Primary text — dark warm brown    */
+  --clr-muted:      #7c7268;   /* Dates, captions, labels           */
+  --clr-accent:     #9b6448;   /* Brand accent — warm terracotta    */
+  --clr-accent-lt:  #c49870;   /* Lighter accent (tag borders, dot) */
+  --clr-shadow:     rgba(56, 50, 44, 0.09);
+
+  /* ── Palette: Dark Mode ────────────────────────────────────────
+     Overridden in [data-theme="dark"] below.
+     Warm charcoal — not harsh black.                              */
+
+  /* ── Typography ────────────────────────────────────────────────
+     Swap font names here to change the whole site's typeface.     */
+  --ff-serif: 'Lora', Georgia, 'Times New Roman', serif;
+  --ff-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ── Font sizes (scale) ──────────────────────────────────────── */
+  --fz-xs:   0.75rem;     /*  12px */
+  --fz-sm:   0.8125rem;   /*  13px */
+  --fz-base: 0.9375rem;   /*  15px */
+  --fz-md:   1rem;        /*  16px */
+  --fz-lg:   1.125rem;    /*  18px */
+  --fz-xl:   1.5rem;      /*  24px */
+  --fz-2xl:  2.25rem;     /*  36px */
+
+  /* ── Layout ─────────────────────────────────────────────────── */
+  --sidebar-w:   180px;   /* Sidebar width on desktop              */
+  --content-max: 680px;   /* Max width of main content column      */
+
+  /* ── Spacing ─────────────────────────────────────────────────── */
+  --sp-xs: 0.5rem;
+  --sp-sm: 1rem;
+  --sp-md: 1.5rem;
+  --sp-lg: 2.5rem;
+  --sp-xl: 4rem;
+
+  /* ── Transitions ─────────────────────────────────────────────── */
+  --t-fast: 0.15s ease;
+  --t-base: 0.25s ease;
+  --t-slow: 0.4s ease;
+}
+
+/* ── Dark Mode overrides ────────────────────────────────────────── */
+[data-theme="dark"] {
+  --clr-bg:        #1c1915;   /* Deep warm charcoal                 */
+  --clr-surface:   #252018;   /* Card / sidebar surface             */
+  --clr-hover:     #2e2820;   /* Hover state                        */
+  --clr-border:    #38302a;   /* Warm dark border                   */
+  --clr-text:      #e6ddd0;   /* Warm off-white text                */
+  --clr-muted:     #9e8e7e;   /* Muted warm gray                    */
+  --clr-accent:    #c49468;   /* Warm amber accent                  */
+  --clr-accent-lt: #7a5c3c;   /* Deep amber for borders             */
+  --clr-shadow:    rgba(0, 0, 0, 0.35);
+}
+
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--ff-sans);
+  font-size: var(--fz-base);
+  line-height: 1.75;
+  color: var(--clr-text);
+  background-color: var(--clr-bg);
+  /* Smooth color transition when toggling dark/light mode */
+  transition: background-color var(--t-slow), color var(--t-slow);
+  min-height: 100vh;
+}
+
+a {
+  color: var(--clr-accent);
+  text-decoration: none;
+  transition: opacity var(--t-fast);
+}
+a:hover { opacity: 0.7; }
+
+img { display: block; max-width: 100%; }
+ul  { list-style: none; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+::selection {
+  background-color: var(--clr-accent-lt);
+  color: var(--clr-bg);
+}
+
+
+/* ================================================================
+   SCROLLBAR  (Webkit browsers)
+   ================================================================ */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: var(--clr-bg); }
+::-webkit-scrollbar-thumb { background: var(--clr-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--clr-accent-lt); }
+
+
+/* ================================================================
+   LAYOUT — sidebar + main content column
+   ================================================================ */
+.main {
+  max-width: var(--content-max);
+  padding: var(--sp-xl) var(--sp-lg);
+}
+
+/* Desktop: push content right of the fixed sidebar */
+@media (min-width: 900px) {
+  .main {
+    margin-left: calc(var(--sidebar-w) + var(--sp-xl));
+    padding-top: var(--sp-xl);
+  }
+}
+
+/* Mobile: extra top padding to clear the hamburger button */
+@media (max-width: 899px) {
+  .main {
+    padding: 5rem var(--sp-md) var(--sp-xl);
+    max-width: 100%;
+  }
+}
+
+
+/* ================================================================
+   SIDEBAR
+   ================================================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  padding: var(--sp-lg) var(--sp-md);
+  background-color: var(--clr-bg);
+  border-right: 1px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-lg);
+  z-index: 100;
+  overflow-y: auto;
+  transition: background-color var(--t-slow), border-color var(--t-slow), transform 0.3s ease;
+}
+
+.sidebar-logo {
+  font-family: var(--ff-serif);
+  font-size: var(--fz-md);
+  font-weight: 600;
+  color: var(--clr-accent);
+  letter-spacing: 0.08em;
+  opacity: 1;        /* override the a:hover opacity reset */
+  display: block;
+}
+.sidebar-logo:hover { opacity: 0.75; }
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.35rem 0.65rem;
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  transition: color var(--t-fast), background-color var(--t-fast);
+  opacity: 1;
+}
+.nav-link:hover {
+  color: var(--clr-text);
+  background-color: var(--clr-hover);
+  opacity: 1;
+}
+/* Active link — highlighted as you scroll */
+.nav-link.active {
+  color: var(--clr-accent);
+  background-color: var(--clr-hover);
+  opacity: 1;
+}
+
+/* ── Mobile: sidebar slides in from left ──────────────────────── */
+@media (max-width: 899px) {
+  .sidebar {
+    width: 240px;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px var(--clr-shadow);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+
+/* ================================================================
+   SIDEBAR OVERLAY (dims the page on mobile when sidebar is open)
+   ================================================================ */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ================================================================
+   HAMBURGER BUTTON  (mobile only)
+   ================================================================ */
+.hamburger {
+  display: none;   /* hidden on desktop */
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 200;
+  width: 38px;
+  height: 38px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 6px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px;
+  transition: background-color var(--t-slow);
+}
+
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: var(--clr-text);
+  border-radius: 2px;
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+
+/* Animate to ✕ when sidebar is open */
+.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+@media (max-width: 899px) {
+  .hamburger { display: flex; }
+}
+
+
+/* ================================================================
+   THEME TOGGLE BUTTON  (always visible, top-right)
+   ================================================================ */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 200;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text);
+  transition: background-color var(--t-slow), border-color var(--t-slow);
+}
+.theme-toggle:hover { background-color: var(--clr-hover); }
+
+.theme-toggle svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Show moon in light mode (click to go dark), sun in dark mode (click to go light) */
+.icon-sun  { display: none;  }
+.icon-moon { display: block; }
+[data-theme="dark"] .icon-sun  { display: block; }
+[data-theme="dark"] .icon-moon { display: none;  }
+
+
+/* ================================================================
+   SECTIONS — shared styles
+   ================================================================ */
+.section {
+  margin-bottom: var(--sp-xl);
+}
+
+.section-title {
+  font-family: var(--ff-serif);
+  font-size: var(--fz-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--clr-text);
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--clr-border);
+  margin-bottom: var(--sp-lg);
+}
+
+.section-subhead {
+  font-style: italic;
+  color: var(--clr-muted);
+  font-size: var(--fz-sm);
+  margin-top: calc(-1 * var(--sp-md));
+  margin-bottom: var(--sp-md);
+}
+
+
+/* ================================================================
+   HERO SECTION
+   ================================================================ */
+.hero-section {
+  text-align: center;
+  padding-top: 0.5rem;
+  margin-bottom: var(--sp-xl);
+}
+
+/* Hand-drawn style avatar: CSS circle with initials */
+.avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--clr-accent-lt);
+  border: 2px solid var(--clr-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ff-serif);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--clr-bg);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-md);
+}
+
+.hero-name {
+  font-family: var(--ff-serif);
+  font-size: var(--fz-2xl);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+}
+
+.hero-bio {
+  color: var(--clr-muted);
+  font-size: var(--fz-md);
+  margin-bottom: 0.3rem;
+}
+
+.hero-location {
+  color: var(--clr-muted);
+  font-size: var(--fz-sm);
+  letter-spacing: 0.025em;
+  margin-bottom: var(--sp-md);
+}
+
+.hero-quote {
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+  line-height: 1.75;
+  border: none;
+  padding: 0;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+
+/* ================================================================
+   ABOUT SECTION
+   ================================================================ */
+.about-layout {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: var(--sp-lg);
+  align-items: start;
+}
+
+/* Stack photo above text on narrow screens */
+@media (max-width: 520px) {
+  .about-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.about-photo-wrap { text-align: center; }
+
+/* Shared placeholder rectangle style (used for about photo + scrapbook) */
+.photo-placeholder {
+  background-color: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  box-shadow: 4px 4px 0 var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-muted);
+  font-style: italic;
+  font-size: var(--fz-xs);
+  transition: background-color var(--t-slow), border-color var(--t-slow), box-shadow var(--t-slow);
+}
+
+/* Size for about section photo slot */
+.about-photo-block {
+  width: 110px;
+  height: 148px;
+  margin: 0 auto var(--sp-xs);
+}
+
+/* If you replace the placeholder with a real <img class="about-img">, this styles it */
+img.about-img {
+  width: 110px;
+  height: 148px;
+  object-fit: cover;
+  border: 1px solid var(--clr-border);
+  box-shadow: 4px 4px 0 var(--clr-border);
+  display: block;
+  margin: 0 auto var(--sp-xs);
+}
+
+.photo-caption {
+  font-size: var(--fz-xs);
+  color: var(--clr-muted);
+  font-style: italic;
+}
+
+.about-text p {
+  font-size: var(--fz-base);
+  margin-bottom: var(--sp-sm);
+}
+.about-text p:last-child { margin-bottom: 0; }
+
+
+/* ================================================================
+   POSTS SECTION
+   ================================================================ */
+.posts-list {
+  border-top: 1px solid var(--clr-border);
+}
+
+.post {
+  border-bottom: 1px solid var(--clr-border);
+  padding: var(--sp-md) 0;
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-sm);
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px;
+  padding: 2px 0;
+}
+.post-header:focus-visible {
+  outline: 2px solid var(--clr-accent);
+  outline-offset: 3px;
+}
+
+.post-title {
+  font-family: var(--ff-serif);
+  font-size: var(--fz-md);
+  font-weight: 600;
+  color: var(--clr-text);
+  line-height: 1.35;
+  margin-bottom: 0.2rem;
+  transition: color var(--t-fast);
+}
+.post-header:hover .post-title { color: var(--clr-accent); }
+
+.post-date {
+  display: block;
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+  letter-spacing: 0.015em;
+}
+
+/* + toggle icon, rotates to × when open */
+.post-chevron {
+  font-size: 1.4rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--clr-muted);
+  flex-shrink: 0;
+  margin-top: 3px;
+  transition: transform 0.25s ease, color var(--t-fast);
+}
+.post.open .post-chevron {
+  transform: rotate(45deg);
+  color: var(--clr-accent);
+}
+
+.post-excerpt {
+  font-style: italic;
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+  margin-top: 0.65rem;
+  line-height: 1.65;
+}
+
+/* Expand/collapse container — uses max-height trick for smooth animation */
+.post-body {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+.post.open .post-body {
+  max-height: 4000px;   /* large enough for any post */
+  opacity: 1;
+}
+
+/* Inner wrapper adds visible top border + padding when expanded */
+.post-body-inner {
+  padding-top: var(--sp-sm);
+  border-top: 1px solid var(--clr-border);
+  margin-top: var(--sp-sm);
+}
+.post-body-inner p {
+  font-size: var(--fz-base);
+  line-height: 1.8;
+  margin-bottom: var(--sp-sm);
+}
+.post-body-inner p:last-child { margin-bottom: 0; }
+
+
+/* ================================================================
+   PROJECTS SECTION
+   ================================================================ */
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-md);
+}
+
+@media (max-width: 480px) {
+  .projects-grid { grid-template-columns: 1fr; }
+}
+
+.project-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 4px;
+  padding: var(--sp-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: box-shadow var(--t-base), transform var(--t-base),
+              background-color var(--t-slow), border-color var(--t-slow);
+}
+.project-card:hover {
+  box-shadow: 0 6px 22px var(--clr-shadow);
+  transform: translateY(-2px);
+}
+
+.project-name {
+  font-family: var(--ff-serif);
+  font-size: var(--fz-md);
+  font-weight: 600;
+  color: var(--clr-text);
+  line-height: 1.3;
+}
+
+.project-desc {
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag {
+  font-size: 0.6875rem;   /* 11px */
+  color: var(--clr-accent);
+  border: 1px solid var(--clr-accent-lt);
+  border-radius: 3px;
+  padding: 0.12rem 0.45rem;
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+  transition: border-color var(--t-slow), color var(--t-slow);
+}
+
+.project-link {
+  font-size: var(--fz-sm);
+  font-weight: 500;
+  color: var(--clr-accent);
+  letter-spacing: 0.02em;
+  display: inline-block;
+  margin-top: auto;
+}
+
+
+/* ================================================================
+   RESUME SECTION
+   ================================================================ */
+
+/* Row that holds the section title + download button side by side */
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-sm);
+  border-bottom: 1px solid var(--clr-border);
+  padding-bottom: 0.6rem;
+  margin-bottom: var(--sp-lg);
+}
+/* Remove the title's own bottom border when it's inside this row */
+.section-title-row .section-title {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* Outline button (used for "Download PDF") */
+.btn-outline {
+  font-size: var(--fz-sm);
+  color: var(--clr-accent);
+  border: 1px solid var(--clr-accent-lt);
+  border-radius: 3px;
+  padding: 0.3rem 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+  opacity: 1;
+}
+.btn-outline:hover {
+  background-color: var(--clr-accent);
+  color: var(--clr-bg);
+  border-color: var(--clr-accent);
+  opacity: 1;
+}
+
+/* Category headings within the timeline (Experience / Education) */
+.timeline-group {
+  font-family: var(--ff-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--clr-muted);
+  margin-top: var(--sp-lg);
+  margin-bottom: var(--sp-md);
+}
+.timeline-group:first-child { margin-top: 0; }
+
+/* Each experience/education entry */
+.timeline-item {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  gap: 0 var(--sp-md);
+  margin-bottom: var(--sp-md);
+}
+
+/* Small dot on the left of each entry */
+.tl-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--clr-accent-lt);
+  border: 1.5px solid var(--clr-accent);
+  margin-top: 0.45rem;
+  flex-shrink: 0;
+  transition: background-color var(--t-slow), border-color var(--t-slow);
+}
+
+.tl-date {
+  display: block;
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.tl-role {
+  font-family: var(--ff-serif);
+  font-size: var(--fz-md);
+  font-weight: 600;
+  color: var(--clr-text);
+  line-height: 1.3;
+  margin-bottom: 0.15rem;
+}
+
+.tl-org {
+  font-size: var(--fz-sm);
+  color: var(--clr-accent);
+  margin-bottom: 0.35rem;
+}
+
+.tl-desc {
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+  line-height: 1.65;
+}
+
+
+/* ================================================================
+   PHOTOS SECTION  (scrapbook grid)
+   ================================================================ */
+.photo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-lg);
+  padding: var(--sp-xs) var(--sp-xs);   /* a little room for the rotated photos */
+}
+
+@media (max-width: 480px) {
+  .photo-grid { grid-template-columns: 1fr; }
+}
+
+.scrapbook-photo { margin: 0; }
+
+/* Scrapbook placeholder (replace with <img> when you have real photos) */
+.scrapbook-block {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 2px solid var(--clr-border);
+  box-shadow: 3px 3px 0 var(--clr-border);
+  transition: border-color var(--t-slow), box-shadow var(--t-slow);
+}
+
+/* If you use a real <img> inside .scrapbook-photo, apply this class to it */
+.scrapbook-photo img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 2px solid var(--clr-border);
+  box-shadow: 3px 3px 0 var(--clr-border);
+  display: block;
+}
+
+.scrapbook-photo figcaption {
+  margin-top: 0.55rem;
+  font-size: var(--fz-xs);
+  color: var(--clr-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+/* Alternating slight rotation for a relaxed, pinned-to-board feel */
+.tilt-l { transform: rotate(-1.4deg); }
+.tilt-r { transform: rotate(0.9deg);  }
+
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-xs);
+  padding-top: var(--sp-md);
+  border-top: 1px solid var(--clr-border);
+  margin-top: var(--sp-xl);
+}
+
+.footer-copy {
+  font-size: var(--fz-sm);
+  color: var(--clr-muted);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fz-sm);
+}
+
+.footer-sep { color: var(--clr-border); }
+
+
+/* ================================================================
+   BACK TO TOP BUTTON
+   ================================================================ */
+.back-to-top {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 200;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-muted);
+  font-size: var(--fz-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Hidden by default — JS adds .visible when scrolled */
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease,
+              background-color var(--t-fast), border-color var(--t-slow);
+}
+.back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.back-to-top:hover { background-color: var(--clr-hover); }

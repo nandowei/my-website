@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- REPLACE: your name in the browser tab -->
+  <title>Fernando Delgado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── THEME TOGGLE (top-right corner) ───────────────────────────── -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <!-- Sun icon — shown in dark mode to switch back to light -->
+    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <!-- Moon icon — shown in light mode to switch to dark -->
+    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
+  <!-- ─── HAMBURGER (mobile only) ────────────────────────────────────── -->
+  <button class="hamburger" id="hamburger" aria-label="Open navigation" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- ─── SIDEBAR ─────────────────────────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar" aria-label="Site navigation">
+    <!-- REPLACE: your initials -->
+    <a href="#hero" class="sidebar-logo">FD</a>
+    <ul class="nav-links" role="list">
+      <li><a href="#about"    class="nav-link">About</a></li>
+      <li><a href="#posts"    class="nav-link">Posts</a></li>
+      <li><a href="#projects" class="nav-link">Projects</a></li>
+      <li><a href="#resume"   class="nav-link">Resume</a></li>
+      <li><a href="#photos"   class="nav-link">Photos</a></li>
+    </ul>
+  </nav>
+
+  <!-- Dim overlay behind sidebar when open on mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <!-- ─── MAIN CONTENT ─────────────────────────────────────────────────── -->
+  <main class="main" id="main">
+
+    <!-- ════════════════════════════════════════════════
+         HERO SECTION
+         ════════════════════════════════════════════════ -->
+    <section id="hero" class="section hero-section">
+
+      <!-- REPLACE: your initials inside the avatar circle -->
+      <div class="avatar" aria-hidden="true">FD</div>
+
+      <!-- REPLACE: your full name -->
+      <h1 class="hero-name">Fernando Delgado</h1>
+
+      <!-- REPLACE: your one-line bio -->
+      <p class="hero-bio">Software engineer &amp; occasional writer.</p>
+
+      <!-- REPLACE: your city / location -->
+      <p class="hero-location">
+        <span aria-hidden="true">◦</span> San Francisco, CA
+      </p>
+
+      <!-- REPLACE: your favorite quote or personal tagline -->
+      <blockquote class="hero-quote">
+        The best time to plant a tree was twenty years ago.<br />
+        The second best time is now.
+      </blockquote>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════
+         ABOUT SECTION
+         ════════════════════════════════════════════════ -->
+    <section id="about" class="section">
+      <h2 class="section-title">About Me</h2>
+
+      <div class="about-layout">
+
+        <div class="about-photo-wrap">
+          <!--
+            REPLACE: swap the .photo-placeholder div below for a real image tag, e.g.:
+            <img src="your-photo.jpg" alt="Fernando Delgado" class="about-img" />
+            The .about-img CSS class handles the vintage border/shadow styling.
+          -->
+          <div class="photo-placeholder about-photo-block" aria-hidden="true">
+            <span>Photo</span>
+          </div>
+          <!-- REPLACE: photo caption -->
+          <p class="photo-caption">Somewhere in 2023</p>
+        </div>
+
+        <div class="about-text">
+          <!-- REPLACE: your bio (3–4 paragraphs recommended) -->
+          <p>Hello! I'm Fernando, a software engineer based in San Francisco with a passion for building things that matter. I've spent the last few years working at the intersection of product and engineering, trying to make technology feel a little more human.</p>
+          <p>Outside of work, I read voraciously, experiment in the kitchen, and spend too much time in used bookstores. This site is my small corner of the internet — a place to think out loud and share what I'm working on.</p>
+          <p>I'm currently interested in the future of human-computer interaction, the craft of writing, and what it means to build software with care.</p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════
+         POSTS SECTION
+         ════════════════════════════════════════════════ -->
+    <section id="posts" class="section">
+      <h2 class="section-title">Posts</h2>
+
+      <div class="posts-list">
+
+        <!-- ── POST 1 ── REPLACE with your own content ── -->
+        <article class="post" data-post="post-1" id="post-1">
+          <div class="post-header" role="button" tabindex="0" aria-expanded="false">
+            <div class="post-header-text">
+              <!-- REPLACE: post title -->
+              <h3 class="post-title">On Slowing Down in a Fast Industry</h3>
+              <!-- REPLACE: publication date (datetime attr = machine-readable YYYY-MM-DD) -->
+              <time class="post-date" datetime="2025-03-14">March 14, 2025</time>
+            </div>
+            <span class="post-chevron" aria-hidden="true">+</span>
+          </div>
+          <!-- REPLACE: short excerpt shown before expanding -->
+          <p class="post-excerpt">
+            There's a quiet tension in tech between the urgency of shipping and the wisdom of waiting.
+            I've been thinking about what it means to move deliberately in an industry that celebrates speed above all else…
+          </p>
+          <div class="post-body" aria-hidden="true">
+            <div class="post-body-inner">
+              <!-- REPLACE: full post content -->
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+              <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
+              <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- ── POST 2 ── REPLACE with your own content ── -->
+        <article class="post" data-post="post-2" id="post-2">
+          <div class="post-header" role="button" tabindex="0" aria-expanded="false">
+            <div class="post-header-text">
+              <!-- REPLACE: post title -->
+              <h3 class="post-title">A Year of Reading Differently</h3>
+              <!-- REPLACE: publication date -->
+              <time class="post-date" datetime="2025-01-02">January 2, 2025</time>
+            </div>
+            <span class="post-chevron" aria-hidden="true">+</span>
+          </div>
+          <!-- REPLACE: excerpt -->
+          <p class="post-excerpt">
+            I made one resolution last year: read slower. Not fewer books, just slower.
+            The results surprised me in ways I didn't expect…
+          </p>
+          <div class="post-body" aria-hidden="true">
+            <div class="post-body-inner">
+              <!-- REPLACE: full post content -->
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Donec in efficitur leo, in commodo orci. Sed blandit libero volutpat sed cras ornare arcu.</p>
+              <p>Nunc scelerisque viverra mauris in aliquam sem fringilla ut. Vitae suscipit tellus mauris a diam maecenas sed enim ut. Faucibus ornare suspendisse sed nisi lacus sed viverra tellus.</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- ── POST 3 ── REPLACE with your own content ── -->
+        <article class="post" data-post="post-3" id="post-3">
+          <div class="post-header" role="button" tabindex="0" aria-expanded="false">
+            <div class="post-header-text">
+              <!-- REPLACE: post title -->
+              <h3 class="post-title">Notes on Building in Public</h3>
+              <!-- REPLACE: publication date -->
+              <time class="post-date" datetime="2024-11-08">November 8, 2024</time>
+            </div>
+            <span class="post-chevron" aria-hidden="true">+</span>
+          </div>
+          <!-- REPLACE: excerpt -->
+          <p class="post-excerpt">
+            Building in public is one of those phrases that sounds simple until you try it.
+            Here's what six months of sharing work-in-progress has taught me…
+          </p>
+          <div class="post-body" aria-hidden="true">
+            <div class="post-body-inner">
+              <!-- REPLACE: full post content -->
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi. Cras vel lorem. Etiam pellentesque aliquet tellus.</p>
+              <p>Phasellus pharetra nulla ac diam. Quisque semper justo at risus. Donec venenatis, turpis vel hendrerit interdum, dui ligula ultricies purus, sed posuere libero dui id orci. Nam congue, pede vitae dapibus aliquet, elit magna vulputate arcu.</p>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════
+         PROJECTS SECTION
+         ════════════════════════════════════════════════ -->
+    <section id="projects" class="section">
+      <h2 class="section-title">Projects</h2>
+
+      <div class="projects-grid">
+
+        <!-- ── PROJECT 1 ── REPLACE with your own project ── -->
+        <div class="project-card">
+          <!-- REPLACE: project name -->
+          <h3 class="project-name">Commonplace</h3>
+          <!-- REPLACE: project description -->
+          <p class="project-desc">A minimal note-taking app inspired by the commonplace books of old — for capturing quotes, ideas, and observations without friction.</p>
+          <div class="project-tags">
+            <!-- REPLACE: your tech stack -->
+            <span class="tag">React</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">Electron</span>
+          </div>
+          <!-- REPLACE: link to your project (GitHub, live site, etc.) -->
+          <a href="#" class="project-link">View →</a>
+        </div>
+
+        <!-- ── PROJECT 2 ── REPLACE with your own project ── -->
+        <div class="project-card">
+          <!-- REPLACE: project name -->
+          <h3 class="project-name">Cartographer</h3>
+          <!-- REPLACE: project description -->
+          <p class="project-desc">A personal geography tracker — log places you've visited, add notes, and generate a printable map of your travels.</p>
+          <div class="project-tags">
+            <!-- REPLACE: your tech stack -->
+            <span class="tag">TypeScript</span>
+            <span class="tag">Mapbox</span>
+            <span class="tag">Supabase</span>
+          </div>
+          <!-- REPLACE: link to your project -->
+          <a href="#" class="project-link">View →</a>
+        </div>
+
+        <!-- ── PROJECT 3 ── REPLACE with your own project ── -->
+        <div class="project-card">
+          <!-- REPLACE: project name -->
+          <h3 class="project-name">Slow Reader</h3>
+          <!-- REPLACE: project description -->
+          <p class="project-desc">A browser extension that adds a reading time estimate and a "save for later" queue to any article — built for deliberate reading habits.</p>
+          <div class="project-tags">
+            <!-- REPLACE: your tech stack -->
+            <span class="tag">JavaScript</span>
+            <span class="tag">Chrome API</span>
+          </div>
+          <!-- REPLACE: link to your project -->
+          <a href="#" class="project-link">View →</a>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════
+         RESUME SECTION
+         ════════════════════════════════════════════════ -->
+    <section id="resume" class="section">
+      <!-- Title row with inline download button -->
+      <div class="section-title-row">
+        <h2 class="section-title">Resume</h2>
+        <!-- REPLACE: href with path to your actual PDF file, e.g. "resume.pdf" -->
+        <a href="#" class="btn-outline" download>Download PDF ↓</a>
+      </div>
+
+      <div class="timeline">
+
+        <h3 class="timeline-group">Experience</h3>
+
+        <!-- ── JOB 1 ── REPLACE with your own experience ── -->
+        <div class="timeline-item">
+          <div class="tl-dot" aria-hidden="true"></div>
+          <div class="tl-body">
+            <!-- REPLACE: date range -->
+            <span class="tl-date">2022 — Present</span>
+            <!-- REPLACE: job title -->
+            <h4 class="tl-role">Senior Software Engineer</h4>
+            <!-- REPLACE: company · location -->
+            <p class="tl-org">Acme Corp · San Francisco, CA</p>
+            <!-- REPLACE: one-line description of impact -->
+            <p class="tl-desc">Led development of the core product API, reducing latency by 40% and improving developer experience for 200+ internal consumers.</p>
+          </div>
+        </div>
+
+        <!-- ── JOB 2 ── REPLACE with your own experience ── -->
+        <div class="timeline-item">
+          <div class="tl-dot" aria-hidden="true"></div>
+          <div class="tl-body">
+            <!-- REPLACE: date range -->
+            <span class="tl-date">2019 — 2022</span>
+            <!-- REPLACE: job title -->
+            <h4 class="tl-role">Software Engineer</h4>
+            <!-- REPLACE: company · location -->
+            <p class="tl-org">Startup Inc · Remote</p>
+            <!-- REPLACE: description -->
+            <p class="tl-desc">Built the initial data pipeline infrastructure and contributed to a frontend redesign that increased user retention by 25%.</p>
+          </div>
+        </div>
+
+        <h3 class="timeline-group">Education</h3>
+
+        <!-- ── EDUCATION ── REPLACE with your own ── -->
+        <div class="timeline-item">
+          <div class="tl-dot" aria-hidden="true"></div>
+          <div class="tl-body">
+            <!-- REPLACE: years -->
+            <span class="tl-date">2015 — 2019</span>
+            <!-- REPLACE: degree -->
+            <h4 class="tl-role">B.S. Computer Science</h4>
+            <!-- REPLACE: institution -->
+            <p class="tl-org">University of California, Berkeley</p>
+            <!-- REPLACE: focus / honors / activities -->
+            <p class="tl-desc">Focus on human-computer interaction and distributed systems.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════
+         PHOTOS SECTION
+         ════════════════════════════════════════════════ -->
+    <section id="photos" class="section">
+      <h2 class="section-title">Photos</h2>
+      <p class="section-subhead">A few moments worth keeping.</p>
+
+      <div class="photo-grid">
+
+        <!--
+          REPLACE: swap the .photo-placeholder div for a real <img> tag, e.g.:
+            <img src="photos/big-sur.jpg" alt="Big Sur coast at sunset" />
+          Keep the <figure> wrapper and <figcaption>.
+        -->
+
+        <!-- REPLACE: photo 1 -->
+        <figure class="scrapbook-photo tilt-l">
+          <div class="photo-placeholder scrapbook-block" style="background-color: #c9b89a;" aria-hidden="true"></div>
+          <!-- REPLACE: caption -->
+          <figcaption>Big Sur, October 2024</figcaption>
+        </figure>
+
+        <!-- REPLACE: photo 2 -->
+        <figure class="scrapbook-photo tilt-r">
+          <div class="photo-placeholder scrapbook-block" style="background-color: #a5b89e;" aria-hidden="true"></div>
+          <!-- REPLACE: caption -->
+          <figcaption>Morning light, SF</figcaption>
+        </figure>
+
+        <!-- REPLACE: photo 3 -->
+        <figure class="scrapbook-photo tilt-r">
+          <div class="photo-placeholder scrapbook-block" style="background-color: #b0a5c8;" aria-hidden="true"></div>
+          <!-- REPLACE: caption -->
+          <figcaption>The bookshelf</figcaption>
+        </figure>
+
+        <!-- REPLACE: photo 4 -->
+        <figure class="scrapbook-photo tilt-l">
+          <div class="photo-placeholder scrapbook-block" style="background-color: #c8a8a8;" aria-hidden="true"></div>
+          <!-- REPLACE: caption -->
+          <figcaption>Portland, June 2024</figcaption>
+        </figure>
+
+      </div>
+    </section>
+
+
+    <!-- ─── FOOTER ─────────────────────────────────────────────────────── -->
+    <footer class="footer">
+      <!-- REPLACE: your name and the current year -->
+      <span class="footer-copy">© 2025 Fernando Delgado</span>
+      <div class="footer-links">
+        <!-- REPLACE: your GitHub username -->
+        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <!-- REPLACE: your email address -->
+        <a href="mailto:you@example.com">Email</a>
+      </div>
+    </footer>
+
+  </main><!-- /main -->
+
+  <!-- ─── BACK TO TOP ──────────────────────────────────────────────────── -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
