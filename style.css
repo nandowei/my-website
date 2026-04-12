@@ -733,33 +733,23 @@ img.about-img {
    ================================================================ */
 .photo-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--sp-lg);
-}
-
-@media (max-width: 480px) {
-  .photo-grid { grid-template-columns: 1fr; }
+  grid-template-columns: 1fr;   /* single column — one photo per row */
+  gap: var(--sp-xl);
 }
 
 .scrapbook-photo { margin: 0; }
 
-/* Scrapbook placeholder (replace with <img> when you have real photos) */
-.scrapbook-block {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-}
-
-/* If you use a real <img> inside .scrapbook-photo, apply this class to it */
+/* Real photos: full width, natural height */
 .scrapbook-photo img {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+  height: auto;
   display: block;
+  border-radius: 2px;
 }
 
 .scrapbook-photo figcaption {
-  margin-top: 0.55rem;
-  font-size: var(--fz-xs);
+  margin-top: 0.6rem;
+  font-size: var(--fz-sm);
   color: var(--clr-muted);
   font-style: italic;
   text-align: center;
