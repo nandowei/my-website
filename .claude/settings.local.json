@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(cp /Users/fernandodelgado/Desktop/Claude/my-website/index.html /tmp/mysite/)",
+      "Bash(cp /Users/fernandodelgado/Desktop/Claude/my-website/style.css /tmp/mysite/)",
+      "Bash(git add:*)"
     ]
   }
 }

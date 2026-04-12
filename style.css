@@ -21,8 +21,8 @@
 
   /* ── Typography ────────────────────────────────────────────────
      Swap font names here to change the whole site's typeface.     */
-  --ff-serif: 'Lora', Georgia, 'Times New Roman', serif;
-  --ff-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ff-serif: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ff-sans:  'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* ── Font sizes (scale) ──────────────────────────────────────── */
   --fz-xs:   0.75rem;     /*  12px */
@@ -405,13 +405,13 @@ button {
    ================================================================ */
 .about-layout {
   display: grid;
-  grid-template-columns: 130px 1fr;
+  grid-template-columns: 210px 1fr;
   gap: var(--sp-lg);
   align-items: start;
 }
 
 /* Stack photo above text on narrow screens */
-@media (max-width: 520px) {
+@media (max-width: 580px) {
   .about-layout {
     grid-template-columns: 1fr;
   }
@@ -422,31 +422,27 @@ button {
 /* Shared placeholder rectangle style (used for about photo + scrapbook) */
 .photo-placeholder {
   background-color: var(--clr-surface);
-  border: 1px solid var(--clr-border);
-  box-shadow: 4px 4px 0 var(--clr-border);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--clr-muted);
   font-style: italic;
   font-size: var(--fz-xs);
-  transition: background-color var(--t-slow), border-color var(--t-slow), box-shadow var(--t-slow);
+  transition: background-color var(--t-slow);
 }
 
 /* Size for about section photo slot */
 .about-photo-block {
-  width: 110px;
-  height: 148px;
+  width: 190px;
+  height: 255px;
   margin: 0 auto var(--sp-xs);
 }
 
 /* If you replace the placeholder with a real <img class="about-img">, this styles it */
 img.about-img {
-  width: 110px;
-  height: 148px;
+  width: 190px;
+  height: 255px;
   object-fit: cover;
-  border: 1px solid var(--clr-border);
-  box-shadow: 4px 4px 0 var(--clr-border);
   display: block;
   margin: 0 auto var(--sp-xs);
 }
@@ -739,7 +735,6 @@ img.about-img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-lg);
-  padding: var(--sp-xs) var(--sp-xs);   /* a little room for the rotated photos */
 }
 
 @media (max-width: 480px) {
@@ -752,9 +747,6 @@ img.about-img {
 .scrapbook-block {
   width: 100%;
   aspect-ratio: 4 / 3;
-  border: 2px solid var(--clr-border);
-  box-shadow: 3px 3px 0 var(--clr-border);
-  transition: border-color var(--t-slow), box-shadow var(--t-slow);
 }
 
 /* If you use a real <img> inside .scrapbook-photo, apply this class to it */
@@ -762,8 +754,6 @@ img.about-img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border: 2px solid var(--clr-border);
-  box-shadow: 3px 3px 0 var(--clr-border);
   display: block;
 }
 
@@ -775,9 +765,8 @@ img.about-img {
   text-align: center;
 }
 
-/* Alternating slight rotation for a relaxed, pinned-to-board feel */
-.tilt-l { transform: rotate(-1.4deg); }
-.tilt-r { transform: rotate(0.9deg);  }
+/* No tilt — clean boxes */
+.tilt-l, .tilt-r { transform: none; }
 
 
 /* ================================================================
