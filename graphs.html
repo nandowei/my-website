@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphs · Fernando Delgado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ── Layout ── */
+    @media (min-width: 900px) { .main { max-width: 860px; } }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--sp-md);
+    }
+    .page-title   { font-size: var(--fz-2xl); font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; }
+    .page-subtitle { font-size: var(--fz-sm); color: var(--clr-muted); margin-top: 0.25rem; font-style: italic; }
+
+    /* ── Data status row ── */
+    .data-bar {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: var(--sp-lg);
+    }
+    .data-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 20px;
+      padding: 0.22rem 0.7rem;
+      transition: background-color var(--t-slow);
+    }
+    .data-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--clr-border); flex-shrink: 0; }
+    .data-dot.ok  { background: #5cb85c; }
+    .data-dot.dim { background: var(--clr-accent-lt); }
+
+    .btn-load {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-xs);
+      color: var(--clr-accent);
+      border: 1px solid var(--clr-accent-lt);
+      border-radius: 4px;
+      padding: 0.28rem 0.8rem;
+      cursor: pointer;
+      background: none;
+      transition: background-color var(--t-fast), opacity var(--t-fast);
+      margin-left: auto;
+    }
+    .btn-load:hover    { background-color: var(--clr-hover); }
+    .btn-load:disabled { opacity: 0.45; cursor: default; }
+
+    /* ── Tabs ── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--clr-border);
+      margin-bottom: var(--sp-lg);
+      overflow-x: auto;
+      gap: 0;
+    }
+    .tab-bar::-webkit-scrollbar { height: 3px; }
+
+    .tab-btn {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-sm);
+      color: var(--clr-muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 0.55rem 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color var(--t-fast), border-color var(--t-fast);
+      flex-shrink: 0;
+    }
+    .tab-btn:hover  { color: var(--clr-text); }
+    .tab-btn.active { color: var(--clr-accent); border-bottom-color: var(--clr-accent); }
+
+    /* ── Tab panels ── */
+    .tab-panel         { display: none; }
+    .tab-panel.active  { display: block; }
+
+    /* ── Charts grid ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-md);
+    }
+    @media (max-width: 640px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    /* ── Chart card ── */
+    .chart-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 6px;
+      padding: var(--sp-md);
+      transition: background-color var(--t-slow), border-color var(--t-slow);
+    }
+    .chart-card.wide { grid-column: 1 / -1; }
+
+    .chart-title {
+      font-size: var(--fz-sm);
+      font-weight: 600;
+      color: var(--clr-text);
+      margin-bottom: var(--sp-sm);
+    }
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+    }
+    .chart-card.wide .chart-wrap { height: 230px; }
+
+    .chart-insight {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      font-style: italic;
+      margin-top: 0.65rem;
+      line-height: 1.55;
+      min-height: 1.1em;
+    }
+
+    /* Empty overlay inside chart-wrap */
+    .empty-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      gap: 0.4rem;
+    }
+    .empty-overlay-icon { font-size: 1.5rem; line-height: 1; }
+    .empty-overlay p { font-size: var(--fz-xs); color: var(--clr-muted); font-style: italic; line-height: 1.5; }
+    .empty-overlay a { color: var(--clr-accent); }
+
+    /* ── Race Readiness custom layout ── */
+    .rd-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 6px;
+      padding: var(--sp-md) var(--sp-lg);
+      transition: background-color var(--t-slow), border-color var(--t-slow);
+    }
+    .rd-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--sp-lg);
+      flex-wrap: wrap;
+      gap: var(--sp-md);
+    }
+    .rd-race-name {
+      font-size: var(--fz-xl);
+      font-weight: 600;
+      color: var(--clr-text);
+      line-height: 1.2;
+    }
+    .rd-race-sub  { font-size: var(--fz-sm); color: var(--clr-muted); margin-top: 0.25rem; }
+    .rd-score-block { text-align: right; flex-shrink: 0; }
+    .rd-score-label { font-size: var(--fz-xs); text-transform: uppercase; letter-spacing: 0.09em; color: var(--clr-muted); margin-bottom: 0.2rem; }
+    .rd-score-val   { font-size: 3rem; font-weight: 600; line-height: 1; color: var(--clr-accent); }
+    .rd-score-badge { font-size: var(--fz-xs); color: var(--clr-muted); margin-top: 0.25rem; }
+
+    .rd-section { margin-bottom: var(--sp-lg); }
+    .rd-section-title {
+      font-size: var(--fz-xs);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--clr-muted);
+      margin-bottom: var(--sp-sm);
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    /* Progress bars */
+    .prog-item { margin-bottom: 0.85rem; }
+    .prog-header { display: flex; justify-content: space-between; font-size: var(--fz-xs); color: var(--clr-muted); margin-bottom: 0.3rem; }
+    .prog-sport { font-weight: 500; color: var(--clr-text); }
+    .prog-track { height: 6px; background: var(--clr-border); border-radius: 3px; overflow: hidden; transition: background-color var(--t-slow); }
+    .prog-fill  { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+    /* Long workouts */
+    .lw-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .lw-item { display: flex; align-items: center; gap: 0.6rem; font-size: var(--fz-sm); }
+    .lw-icon { font-size: 1rem; flex-shrink: 0; }
+    .lw-text { color: var(--clr-text); }
+    .lw-sub  { color: var(--clr-muted); font-size: var(--fz-xs); }
+
+    /* Recommendations */
+    .rd-recs { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .rd-recs li { font-size: var(--fz-sm); color: var(--clr-muted); padding-left: 1.2em; position: relative; line-height: 1.5; }
+    .rd-recs li::before { content: '→'; position: absolute; left: 0; color: var(--clr-accent); }
+
+    /* Targets config */
+    .targets-wrap {
+      margin-top: var(--sp-lg);
+      padding-top: var(--sp-md);
+      border-top: 1px solid var(--clr-border);
+    }
+    .targets-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--sp-sm);
+      margin-bottom: var(--sp-sm);
+    }
+    @media (max-width: 640px) { .targets-grid { grid-template-columns: 1fr 1fr; } }
+    .settings-field label { font-size: var(--fz-xs); color: var(--clr-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; display: block; margin-bottom: 0.3rem; }
+    .settings-field input {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-sm);
+      color: var(--clr-text);
+      background: var(--clr-bg);
+      border: 1px solid var(--clr-border);
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      width: 100%;
+      transition: border-color var(--t-fast), background-color var(--t-slow);
+    }
+    .settings-field input:focus { outline: none; border-color: var(--clr-accent); }
+
+    .btn-primary {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-sm);
+      font-weight: 500;
+      color: var(--clr-bg);
+      background: var(--clr-accent);
+      border: none;
+      border-radius: 4px;
+      padding: 0.42rem 1.1rem;
+      cursor: pointer;
+      transition: opacity var(--t-fast);
+    }
+    .btn-primary:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── THEME TOGGLE ─────────────────────────────────────────────────────── -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
+  <!-- ─── HAMBURGER ───────────────────────────────────────────────────────── -->
+  <button class="hamburger" id="hamburger" aria-label="Open navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- ─── SIDEBAR ─────────────────────────────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar" aria-label="Site navigation">
+    <a href="index.html" class="sidebar-logo">FD</a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html#about"    class="nav-link">About</a></li>
+      <li><a href="index.html#posts"    class="nav-link">Posts</a></li>
+      <li><a href="index.html#projects" class="nav-link">Projects</a></li>
+      <li><a href="index.html#resume"   class="nav-link">Resume</a></li>
+      <li><a href="index.html#photos"   class="nav-link">Photos</a></li>
+      <li><a href="training.html"       class="nav-link">Training</a></li>
+      <li><a href="graphs.html"         class="nav-link active">Graphs</a></li>
+    </ul>
+  </nav>
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <!-- ─── MAIN ────────────────────────────────────────────────────────────── -->
+  <main class="main" id="main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Graphs</h1>
+        <p class="page-subtitle">Training analytics — Strava + daily health log</p>
+      </div>
+    </div>
+
+    <!-- Data status + load button -->
+    <div class="data-bar" id="dataBar">
+      <div class="data-chip"><div class="data-dot" id="stravaDot"></div><span id="stravaChip">Strava: no data</span></div>
+      <div class="data-chip"><div class="data-dot dim"></div><span id="garminChip">Garmin: no logs</span></div>
+      <button class="btn-load" id="loadHistoryBtn">Load 200 activities</button>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" role="tablist" aria-label="Analytics sections">
+      <button class="tab-btn active" data-tab="fitness"  role="tab" aria-selected="true">Fitness</button>
+      <button class="tab-btn"        data-tab="running"  role="tab">Running</button>
+      <button class="tab-btn"        data-tab="cycling"  role="tab">Cycling</button>
+      <button class="tab-btn"        data-tab="recovery" role="tab">Recovery</button>
+      <button class="tab-btn"        data-tab="race"     role="tab">Race Readiness</button>
+    </div>
+
+    <!-- Tab panels -->
+    <div id="tab-fitness"  class="tab-panel active" role="tabpanel"><div class="charts-grid" id="grid-fitness"></div></div>
+    <div id="tab-running"  class="tab-panel"        role="tabpanel"><div class="charts-grid" id="grid-running"></div></div>
+    <div id="tab-cycling"  class="tab-panel"        role="tabpanel"><div class="charts-grid" id="grid-cycling"></div></div>
+    <div id="tab-recovery" class="tab-panel"        role="tabpanel"><div class="charts-grid" id="grid-recovery"></div></div>
+    <div id="tab-race"     class="tab-panel"        role="tabpanel"><div id="raceContent"></div></div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top:var(--sp-xl)">
+      <span class="footer-copy">© 2025 Fernando Delgado</span>
+      <div class="footer-links">
+        <a href="training.html">Training</a>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <a href="index.html">← Home</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <script>
+  'use strict';
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // UTILITIES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const store = {
+    get : k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+    set : (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  };
+  const $ = id => document.getElementById(id);
+
+  const M2MI = d => +(d / 1609.344).toFixed(2);
+  const M2YD = d => Math.round(d * 1.09361);
+
+  function secsToPace(secs, distM) {
+    if (!distM || !secs) return null;
+    const minPerMile = secs / 60 / (distM / 1609.344);
+    const m = Math.floor(minPerMile);
+    const s = Math.round((minPerMile - m) * 60).toString().padStart(2, '0');
+    return minPerMile;  // return as decimal for plotting
+  }
+  function fmtPace(dec) {
+    if (dec == null) return '—';
+    const m = Math.floor(dec);
+    const s = Math.round((dec - m) * 60).toString().padStart(2, '0');
+    return `${m}:${s}/mi`;
+  }
+  function fmtDate(isoOrDate) {
+    return new Date(isoOrDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+  function daysUntil(dateStr) {
+    const t = new Date(dateStr); t.setHours(0,0,0,0);
+    const n = new Date();        n.setHours(0,0,0,0);
+    return Math.ceil((t - n) / 86400000);
+  }
+
+  // Monday of the week containing `date`
+  function weekMonday(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  // Array of {monday, nextMonday, label} for the last N weeks (oldest first)
+  function weekBuckets(n) {
+    const out = [];
+    const base = weekMonday(new Date());
+    for (let i = n - 1; i >= 0; i--) {
+      const monday = new Date(base);
+      monday.setDate(base.getDate() - i * 7);
+      const next = new Date(monday);
+      next.setDate(monday.getDate() + 7);
+      out.push({ monday, nextMonday: next, label: fmtDate(monday) });
+    }
+    return out;
+  }
+
+  // Activities within a week bucket
+  function inWeek(acts, bkt) {
+    return acts.filter(a => { const d = new Date(a.start_date); return d >= bkt.monday && d < bkt.nextMonday; });
+  }
+
+  // Rolling average (null-safe)
+  function rollingAvg(arr, w) {
+    return arr.map((_, i) => {
+      const slice = arr.slice(Math.max(0, i - w + 1), i + 1).filter(v => v != null && !isNaN(v));
+      return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : null;
+    });
+  }
+
+  // Simple linear regression → {slope, intercept}
+  function linReg(xArr, yArr) {
+    const n = xArr.length;
+    if (n < 2) return null;
+    const sx = xArr.reduce((a,b)=>a+b,0), sy = yArr.reduce((a,b)=>a+b,0);
+    const sxy = xArr.reduce((s,x,i)=>s+x*yArr[i],0);
+    const sx2 = xArr.reduce((s,x)=>s+x*x,0);
+    const denom = n*sx2 - sx*sx;
+    if (!denom) return null;
+    const slope = (n*sxy - sx*sy)/denom;
+    const intercept = (sy - slope*sx)/n;
+    return { slope, intercept };
+  }
+
+  function activityTSS(a) {
+    if (a.suffer_score) return a.suffer_score;
+    const hrs = (a.moving_time||0)/3600;
+    if (a.type==='Ride' && a.average_watts>50) {
+      const IF = Math.min(a.average_watts/250,1.05);
+      return +(hrs*IF*IF*100).toFixed(0);
+    }
+    if (a.average_heartrate) {
+      const r = a.average_heartrate/180;
+      return +(hrs*Math.min(r,1)*Math.min(r,1)*100).toFixed(0);
+    }
+    return +((hrs * {Run:55,Ride:45,Swim:35}[a.type]||40)).toFixed(0);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DATA ACCESS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function getActivities() {
+    // Prefer extended cache (200 acts) over regular (30 acts)
+    const ext = store.get('strava_extended');
+    const reg = store.get('strava_cache');
+    const src = (ext?.activities?.length||0) >= (reg?.activities?.length||0) ? ext : reg;
+    return (src?.activities||[]).slice().sort((a,b)=>new Date(a.start_date)-new Date(b.start_date));
+  }
+
+  function getGarminHistory(days=90) {
+    const out=[];
+    for (let i=days-1; i>=0; i--) {
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const key = d.toISOString().slice(0,10);
+      out.push({ date: key, ...(store.get(`garmin_${key}`)||{}) });
+    }
+    return out;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CSS COLOR READER — call fresh on each render so dark/light is respected
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function clr() {
+    const cs = getComputedStyle(document.documentElement);
+    const g  = v => cs.getPropertyValue(v).trim();
+    const dark = document.documentElement.getAttribute('data-theme')==='dark';
+    return {
+      text    : g('--clr-text'),
+      muted   : g('--clr-muted'),
+      border  : g('--clr-border'),
+      surface : g('--clr-surface'),
+      accent  : g('--clr-accent'),
+      accentLt: g('--clr-accent-lt'),
+      grid    : dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+      tipBg   : dark ? '#252018' : '#f2efe8',
+      tipBorder: dark ? '#38302a' : '#ddd8cc',
+      swim    : '#5da4c4',
+      bike    : '#c49468',
+      run     : '#9b6448',
+      swimA   : 'rgba(93,164,196,0.18)',
+      bikeA   : 'rgba(196,148,104,0.18)',
+      runA    : 'rgba(155,100,72,0.18)',
+      good    : '#5cb85c',
+      warn    : '#e8a838',
+      bad     : '#d9534f',
+      goodA   : 'rgba(92,184,92,0.18)',
+      warnA   : 'rgba(232,168,56,0.18)',
+      badA    : 'rgba(217,83,79,0.18)',
+    };
+  }
+
+  // Shared axis/tooltip defaults
+  function baseOpts(c, extra={}) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: c.muted, font: { family:"'DM Sans',sans-serif", size:11 }, usePointStyle:true, pointStyleWidth:7, padding:12 }
+        },
+        tooltip: {
+          backgroundColor: c.tipBg, borderColor: c.tipBorder, borderWidth:1,
+          titleColor: c.text, bodyColor: c.muted, padding:10, cornerRadius:5,
+        },
+        ...extra.plugins,
+      },
+      scales: {
+        x: { grid:{color:c.grid}, ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}}, border:{color:c.border} },
+        y: { grid:{color:c.grid}, ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}}, border:{color:c.border} },
+        ...extra.scales,
+      },
+      ...extra.top,
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART REGISTRY
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const chartReg = {};
+
+  function mkChart(canvasId, cfg) {
+    if (chartReg[canvasId]) { chartReg[canvasId].destroy(); delete chartReg[canvasId]; }
+    const el = $(canvasId); if (!el) return;
+    chartReg[canvasId] = new Chart(el, cfg);
+  }
+
+  function showEmpty(wrapId, msg, linkHtml='') {
+    const wrap = $(wrapId); if (!wrap) return;
+    const cv = wrap.querySelector('canvas'); if (cv) cv.style.visibility='hidden';
+    wrap.querySelectorAll('.empty-overlay').forEach(e=>e.remove());
+    const div = document.createElement('div'); div.className='empty-overlay';
+    div.innerHTML=`<div class="empty-overlay-icon">📊</div><p>${msg}${linkHtml?'<br>'+linkHtml:''}</p>`;
+    wrap.appendChild(div);
+  }
+  function clearOverlay(wrapId) {
+    const wrap = $(wrapId); if (!wrap) return;
+    const cv = wrap.querySelector('canvas'); if (cv) cv.style.visibility='';
+    wrap.querySelectorAll('.empty-overlay').forEach(e=>e.remove());
+  }
+  function setInsight(id, txt) { const el=$(id); if(el) el.textContent=txt; }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CARD BUILDER
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function makeCard(id, title, opts={}) {
+    const d = document.createElement('div');
+    d.className = 'chart-card' + (opts.wide?' wide':'');
+    d.id = `card-${id}`;
+    d.innerHTML =
+      `<p class="chart-title">${title}</p>` +
+      `<div class="chart-wrap" id="wrap-${id}"><canvas id="canvas-${id}"></canvas></div>` +
+      `<p class="chart-insight" id="insight-${id}"></p>`;
+    return d;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 1 — Weekly Training Volume (stacked bar)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildWeeklyVolume(acts, c) {
+    clearOverlay('wrap-weekly-vol');
+    if (!acts.length) { showEmpty('wrap-weekly-vol','Connect Strava to see weekly volume',`<a href="training.html">→ Training page</a>`); setInsight('insight-weekly-vol','No Strava data yet.'); return; }
+
+    const bkts  = weekBuckets(12);
+    const swim  = bkts.map(b => +(inWeek(acts,b).filter(a=>a.type==='Swim').reduce((s,a)=>s+M2MI(a.distance),0)).toFixed(1));
+    const bike  = bkts.map(b => +(inWeek(acts,b).filter(a=>a.type==='Ride').reduce((s,a)=>s+M2MI(a.distance),0)).toFixed(1));
+    const run   = bkts.map(b => +(inWeek(acts,b).filter(a=>a.type==='Run' ).reduce((s,a)=>s+M2MI(a.distance),0)).toFixed(1));
+    const labels = bkts.map(b=>b.label);
+
+    mkChart('canvas-weekly-vol',{type:'bar',data:{labels,datasets:[
+      {label:'Swim',data:swim,backgroundColor:c.swimA,borderColor:c.swim,borderWidth:1.5,stack:'s'},
+      {label:'Bike',data:bike,backgroundColor:c.bikeA,borderColor:c.bike,borderWidth:1.5,stack:'s'},
+      {label:'Run', data:run, backgroundColor:c.runA, borderColor:c.run, borderWidth:1.5,stack:'s'},
+    ]},options:baseOpts(c,{
+      scales:{x:{stacked:true,grid:{color:c.grid},ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:10}},border:{color:c.border}},y:{stacked:true,grid:{color:c.grid},ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:11},callback:v=>`${v}mi`},border:{color:c.border}}},
+    })});
+
+    const thisW = swim.at(-1)+bike.at(-1)+run.at(-1);
+    const lastW = swim.at(-2)+bike.at(-2)+run.at(-2);
+    const delta = thisW-lastW;
+    const sign  = delta>0?'↑':'↓';
+    setInsight('insight-weekly-vol', `This week: ${run.at(-1)}mi run · ${bike.at(-1)}mi bike · ${swim.at(-1)}mi swim (${thisW.toFixed(1)} total). ${Math.abs(delta).toFixed(1)}mi ${sign} vs last week.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 2 — Cumulative YTD Volume by Sport
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildCumulative(acts, c) {
+    clearOverlay('wrap-cumulative');
+    const jan1 = new Date(new Date().getFullYear(),0,1);
+    const ytd  = acts.filter(a=>new Date(a.start_date)>=jan1);
+
+    if (ytd.length < 3) { showEmpty('wrap-cumulative','Need activities from this year to show YTD volume.'); setInsight('insight-cumulative',''); return; }
+
+    // Build day-by-day cumulative series
+    const sorted = ytd.slice().sort((a,b)=>new Date(a.start_date)-new Date(b.start_date));
+    const labels=[], swimCum=[], bikeCum=[], runCum=[];
+    let sw=0, bk=0, rn=0;
+
+    sorted.forEach(a=>{
+      if(a.type==='Swim') sw += M2MI(a.distance);
+      if(a.type==='Ride') bk += M2MI(a.distance);
+      if(a.type==='Run')  rn += M2MI(a.distance);
+      labels.push(fmtDate(a.start_date));
+      swimCum.push(+sw.toFixed(1)); bikeCum.push(+bk.toFixed(1)); runCum.push(+rn.toFixed(1));
+    });
+
+    mkChart('canvas-cumulative',{type:'line',data:{labels,datasets:[
+      {label:'Swim',data:swimCum,borderColor:c.swim,backgroundColor:c.swimA,fill:false,tension:0.35,pointRadius:0,borderWidth:2},
+      {label:'Bike',data:bikeCum,borderColor:c.bike,backgroundColor:c.bikeA,fill:false,tension:0.35,pointRadius:0,borderWidth:2},
+      {label:'Run', data:runCum, borderColor:c.run, backgroundColor:c.runA, fill:false,tension:0.35,pointRadius:0,borderWidth:2},
+    ]},options:baseOpts(c,{
+      scales:{x:{grid:{display:false},ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:10},maxTicksLimit:8},border:{color:c.border}},y:{grid:{color:c.grid},ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:11},callback:v=>`${v}mi`},border:{color:c.border}}},
+    })});
+
+    setInsight('insight-cumulative',`Year-to-date (${labels[0]}–today): ${rn.toFixed(0)}mi running · ${bk.toFixed(0)}mi biking · ${sw.toFixed(0)}mi swimming.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 3 — Weekly Training Load (TSS estimate) + 4-week rolling avg
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildTrainingLoad(acts, c) {
+    clearOverlay('wrap-load');
+    if (!acts.length) { showEmpty('wrap-load','Connect Strava to see training load.'); setInsight('insight-load',''); return; }
+
+    const bkts   = weekBuckets(12);
+    const weekly = bkts.map(b=>inWeek(acts,b).reduce((s,a)=>s+activityTSS(a),0));
+    const avg4   = rollingAvg(weekly,4);
+    const labels = bkts.map(b=>b.label);
+
+    mkChart('canvas-load',{type:'bar',data:{labels,datasets:[
+      {type:'bar', label:'Weekly Load',  data:weekly, backgroundColor:c.runA, borderColor:c.run,  borderWidth:1.5, order:2},
+      {type:'line',label:'4-wk Avg',    data:avg4,   borderColor:c.accentLt, borderWidth:2, pointRadius:0, tension:0.4, fill:false, order:1},
+    ]},options:baseOpts(c)});
+
+    const cur = weekly.at(-1), avg = avg4.filter(Boolean).at(-1)||0;
+    const trend = cur>avg*1.1?'above average — building nicely': cur<avg*0.85?'below average — recovery week?':'on track with rolling average';
+    setInsight('insight-load',`This week's estimated load: ${cur} TSS. 4-week avg: ${avg.toFixed(0)}. You are ${trend}.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 4 — Pace Trend (scatter + regression line)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildPaceTrend(acts, c) {
+    clearOverlay('wrap-pace-trend');
+    const runs = acts.filter(a=>a.type==='Run' && a.distance>500 && a.moving_time);
+    if (runs.length < 3) { showEmpty('wrap-pace-trend','Need at least 3 runs to show pace trend.'); setInsight('insight-pace-trend',''); return; }
+
+    const pts = runs.map(a=>({ x:new Date(a.start_date).getTime(), y:secsToPace(a.moving_time,a.distance), dist:M2MI(a.distance) })).filter(p=>p.y&&p.y<20);
+    const short=pts.filter(p=>p.dist<5), med=pts.filter(p=>p.dist>=5&&p.dist<10), lng=pts.filter(p=>p.dist>=10);
+
+    const xArr=pts.map(p=>p.x), yArr=pts.map(p=>p.y);
+    const reg = linReg(xArr,yArr);
+    const xMin=Math.min(...xArr), xMax=Math.max(...xArr);
+    const trendData = reg ? [{x:xMin,y:reg.slope*xMin+reg.intercept},{x:xMax,y:reg.slope*xMax+reg.intercept}] : [];
+
+    const tickFmt = v=>new Date(v).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+    mkChart('canvas-pace-trend',{type:'scatter',data:{datasets:[
+      {type:'scatter',label:'< 5 mi',  data:short.map(p=>({x:p.x,y:p.y})),pointBackgroundColor:c.swimA.replace('.18','1'),pointBorderColor:c.swim,pointRadius:5,pointHoverRadius:7},
+      {type:'scatter',label:'5–10 mi', data:med.map(p=>({x:p.x,y:p.y})),  pointBackgroundColor:c.bikeA.replace('.18','1'),pointBorderColor:c.bike,pointRadius:5,pointHoverRadius:7},
+      {type:'scatter',label:'> 10 mi', data:lng.map(p=>({x:p.x,y:p.y})),  pointBackgroundColor:c.runA.replace('.18','1'), pointBorderColor:c.run, pointRadius:6,pointHoverRadius:8},
+      {type:'line',   label:'Trend',   data:trendData, borderColor:c.muted, borderWidth:1.5, borderDash:[4,4], pointRadius:0, fill:false},
+    ]},options:baseOpts(c,{
+      scales:{
+        x:{type:'linear',ticks:{callback:tickFmt,color:c.muted,font:{family:"'DM Sans',sans-serif",size:10},maxTicksLimit:6},grid:{color:c.grid},border:{color:c.border}},
+        y:{reverse:true,ticks:{callback:v=>fmtPace(v),color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border},title:{display:true,text:'pace / mi',color:c.muted,font:{size:10}}},
+      },
+      plugins:{tooltip:{callbacks:{label:ctx=>`${fmtPace(ctx.parsed.y)} on ${fmtDate(new Date(ctx.parsed.x))}`}}},
+    })});
+
+    // Insight: compare first-half avg vs second-half avg
+    const half = Math.floor(pts.length/2);
+    const early = pts.slice(0,half).reduce((s,p)=>s+p.y,0)/half;
+    const late  = pts.slice(half).reduce((s,p)=>s+p.y,0)/(pts.length-half);
+    const diff  = early-late, absDiff=Math.abs(diff*60).toFixed(0);
+    const dir   = diff>5?`improved by ~${absDiff}s/mi`:diff<-5?`slowed by ~${absDiff}s/mi`:'stayed consistent';
+    setInsight('insight-pace-trend',`Across ${runs.length} runs, your pace has ${dir}. Latest avg: ${fmtPace(late)}.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 5 — Heart Rate vs Pace (aerobic efficiency)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildHRvsPace(acts, c) {
+    clearOverlay('wrap-hr-pace');
+    const runs = acts.filter(a=>a.type==='Run'&&a.average_heartrate&&a.distance>500&&a.moving_time);
+    if (runs.length < 3) { showEmpty('wrap-hr-pace','Need runs with heart rate data to show efficiency.'); setInsight('insight-hr-pace',''); return; }
+
+    const pts = runs.map(a=>({x:secsToPace(a.moving_time,a.distance), y:a.average_heartrate, date:a.start_date})).filter(p=>p.x&&p.x<20);
+    // Color by recency: older = more transparent
+    const n = pts.length;
+    const colors = pts.map((_,i)=>`rgba(155,100,72,${0.25+0.75*(i/(n-1||1))})`);
+
+    mkChart('canvas-hr-pace',{type:'scatter',data:{datasets:[{
+      label:'Run',data:pts.map(p=>({x:p.x,y:p.y})),
+      pointBackgroundColor:colors, pointBorderColor:c.run, pointRadius:5, pointHoverRadius:7,
+    }]},options:baseOpts(c,{
+      scales:{
+        x:{type:'linear',reverse:true,ticks:{callback:v=>fmtPace(v),color:c.muted,font:{family:"'DM Sans',sans-serif",size:10},maxTicksLimit:6},grid:{color:c.grid},border:{color:c.border},title:{display:true,text:'pace (faster →)',color:c.muted,font:{size:10}}},
+        y:{ticks:{callback:v=>`${v} bpm`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border},title:{display:true,text:'avg HR',color:c.muted,font:{size:10}}},
+      },
+      plugins:{tooltip:{callbacks:{label:ctx=>`${fmtPace(ctx.parsed.x)} @ ${ctx.parsed.y} bpm · ${fmtDate(pts[ctx.dataIndex].date)}`}}},
+    })});
+
+    const recent4 = pts.slice(-4);
+    const avgHR = (recent4.reduce((s,p)=>s+p.y,0)/recent4.length).toFixed(0);
+    const avgPace = fmtPace(recent4.reduce((s,p)=>s+p.x,0)/recent4.length);
+    setInsight('insight-hr-pace',`Last 4 runs: avg ${avgHR} bpm at ${avgPace}. Points moving right (faster same HR) = improving aerobic efficiency.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 6 — Long Run Progress (weekly longest run, 16 weeks)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildLongRun(acts, c) {
+    clearOverlay('wrap-long-run');
+    const runs = acts.filter(a=>a.type==='Run');
+    if (runs.length < 2) { showEmpty('wrap-long-run','Need running data to show long run progress.'); setInsight('insight-long-run',''); return; }
+
+    const bkts   = weekBuckets(16);
+    const longest = bkts.map(b=>{ const r=inWeek(runs,b); return r.length?+(Math.max(...r.map(a=>M2MI(a.distance)))).toFixed(1):null; });
+    const colors  = longest.map(v=>v==null?c.border:v>=16?c.good:v>=10?c.warn:c.run);
+
+    mkChart('canvas-long-run',{type:'bar',data:{labels:bkts.map(b=>b.label),datasets:[{
+      label:'Long Run',data:longest,backgroundColor:colors.map(x=>x+'33'),borderColor:colors,borderWidth:2,borderRadius:3,
+    }]},options:baseOpts(c,{
+      scales:{y:{ticks:{callback:v=>`${v}mi`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border}}},
+      top:{plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} miles`}}}},
+    })});
+
+    const best = Math.max(...longest.filter(Boolean));
+    const thisW = longest.at(-1);
+    setInsight('insight-long-run',`Longest run in 16 weeks: ${best}mi. This week's long run: ${thisW!=null?thisW+'mi':'none logged yet'}.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 7 — Power / Effort Trend (cycling)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildPowerTrend(acts, c) {
+    clearOverlay('wrap-power');
+    const rides = acts.filter(a=>a.type==='Ride');
+    const powered = rides.filter(a=>a.average_watts>50);
+    const src = powered.length >= 3 ? powered : rides;
+    if (src.length < 2) { showEmpty('wrap-power','Need cycling data to show power/effort trend.'); setInsight('insight-power',''); return; }
+
+    const hasPower = powered.length >= 3;
+    const labels = src.map(a=>fmtDate(a.start_date));
+    const values = src.map(a=>hasPower?a.average_watts:Math.round((a.average_heartrate||0)*0.8)||null);
+
+    mkChart('canvas-power',{type:'line',data:{labels,datasets:[{
+      label: hasPower?'Avg Watts':'Effort (HR proxy)',
+      data:values, borderColor:c.bike, backgroundColor:c.bikeA, fill:true, tension:0.35, pointRadius:3, borderWidth:2,
+    }]},options:baseOpts(c,{
+      scales:{y:{ticks:{callback:v=>hasPower?`${v}w`:`${v}`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border}}},
+    })});
+
+    const recentAvg = (values.slice(-4).filter(Boolean).reduce((a,b)=>a+b,0)/4).toFixed(0);
+    const label = hasPower?`${recentAvg}w avg (last 4 rides).`:`Avg effort proxy: ${recentAvg} (last 4 rides). Connect a power meter for wattage.`;
+    setInsight('insight-power',label);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 8 — Ride Distance Distribution (histogram)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildRideDistribution(acts, c) {
+    clearOverlay('wrap-ride-dist');
+    const rides = acts.filter(a=>a.type==='Ride');
+    if (rides.length < 2) { showEmpty('wrap-ride-dist','Need cycling data to show distribution.'); setInsight('insight-ride-dist',''); return; }
+
+    const buckets = [{l:'<10',min:0,max:10},{l:'10–20',min:10,max:20},{l:'20–30',min:20,max:30},{l:'30–40',min:30,max:40},{l:'40–60',min:40,max:60},{l:'60+',min:60,max:Infinity}];
+    const counts = buckets.map(b=>rides.filter(a=>{const m=M2MI(a.distance);return m>=b.min&&m<b.max;}).length);
+
+    mkChart('canvas-ride-dist',{type:'bar',data:{labels:buckets.map(b=>b.l+' mi'),datasets:[{
+      label:'Rides',data:counts,backgroundColor:c.bikeA,borderColor:c.bike,borderWidth:1.5,borderRadius:4,
+    }]},options:baseOpts(c,{
+      scales:{x:{grid:{display:false},ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},border:{color:c.border}},y:{ticks:{callback:v=>`${v} rides`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11},stepSize:1},grid:{color:c.grid},border:{color:c.border}}},
+    })});
+
+    const peak = buckets[counts.indexOf(Math.max(...counts))];
+    setInsight('insight-ride-dist',`Most common ride length: ${peak.l} miles (${Math.max(...counts)} rides). ${rides.length} total rides in dataset.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 9 — HRV Trend (30 days, color-coded, 7-day rolling avg)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildHRVTrend(garmin, c) {
+    clearOverlay('wrap-hrv');
+    const withHRV = garmin.filter(g=>g.hrv!=null);
+    if (withHRV.length < 2) { showEmpty('wrap-hrv','Log HRV on the Training page to see the trend.'); setInsight('insight-hrv',''); return; }
+
+    const labels = garmin.map(g=>fmtDate(g.date));
+    const vals   = garmin.map(g=>g.hrv||null);
+    const avg7   = rollingAvg(vals,7);
+    const baseline = withHRV.reduce((s,g)=>s+g.hrv,0)/withHRV.length;
+
+    // Per-point color based on deviation from baseline
+    const ptColors = vals.map(v=> v==null?'transparent': v>=baseline*0.97?c.good: v>=baseline*0.87?c.warn: c.bad);
+
+    mkChart('canvas-hrv',{type:'line',data:{labels,datasets:[
+      {label:'HRV',data:vals, borderColor:c.accent,backgroundColor:'transparent',tension:0.3,pointRadius:4,pointBackgroundColor:ptColors,pointBorderColor:ptColors,borderWidth:1.5,
+        segment:{borderColor:ctx=>{ const v=ctx.p1.parsed.y; return v>=baseline*0.97?c.good:v>=baseline*0.87?c.warn:c.bad; }}
+      },
+      {label:'7-day avg',data:avg7,borderColor:c.muted,borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.4,fill:false},
+    ]},options:baseOpts(c,{
+      scales:{
+        x:{ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:10},maxTicksLimit:8},grid:{display:false},border:{color:c.border}},
+        y:{ticks:{callback:v=>`${v}ms`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border}},
+      },
+    })});
+
+    const recent7 = withHRV.slice(-7);
+    const recent7avg = (recent7.reduce((s,g)=>s+g.hrv,0)/recent7.length).toFixed(0);
+    const compare = (+recent7avg-baseline).toFixed(0);
+    const dir = compare>0?`+${compare}ms above`:`${compare}ms below`;
+    setInsight('insight-hrv',`7-day avg HRV: ${recent7avg}ms — ${dir} your ${withHRV.length}-day baseline of ${baseline.toFixed(0)}ms. Green = good recovery, red = elevated fatigue.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 10 — Sleep Score (color-coded bar)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildSleepScore(garmin, c) {
+    clearOverlay('wrap-sleep');
+    const withSleep = garmin.filter(g=>g.sleepScore!=null);
+    if (withSleep.length < 2) { showEmpty('wrap-sleep','Log sleep score on the Training page.'); setInsight('insight-sleep',''); return; }
+
+    const recent = garmin.slice(-30);
+    const labels = recent.map(g=>fmtDate(g.date));
+    const vals   = recent.map(g=>g.sleepScore||null);
+    const colors = vals.map(v=>v==null?'transparent':v>=80?c.good:v>=65?c.warn:c.bad);
+
+    mkChart('canvas-sleep',{type:'bar',data:{labels,datasets:[{
+      label:'Sleep Score',data:vals,backgroundColor:colors.map(x=>x+'55'),borderColor:colors,borderWidth:1.5,borderRadius:3,
+    }]},options:baseOpts(c,{
+      scales:{
+        x:{ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:10},maxTicksLimit:8},grid:{display:false},border:{color:c.border}},
+        y:{min:0,max:100,ticks:{callback:v=>`${v}`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border}},
+      },
+      plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}/100`}}},
+    })});
+
+    const avg = (withSleep.reduce((s,g)=>s+g.sleepScore,0)/withSleep.length).toFixed(0);
+    const best = Math.max(...withSleep.map(g=>g.sleepScore));
+    setInsight('insight-sleep',`Avg sleep score: ${avg}/100. Best night: ${best}/100. ${avg>=80?'Great consistency — keep it up.':avg>=65?'Room to improve — focus on sleep hygiene.':'Prioritise sleep; it drives recovery.'}`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 11 — Body Battery (area chart)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildBodyBattery(garmin, c) {
+    clearOverlay('wrap-battery');
+    const withBB = garmin.filter(g=>g.bodyBattery!=null);
+    if (withBB.length < 2) { showEmpty('wrap-battery','Log body battery on the Training page.'); setInsight('insight-battery',''); return; }
+
+    const recent = garmin.slice(-30);
+    const labels = recent.map(g=>fmtDate(g.date));
+    const vals   = recent.map(g=>g.bodyBattery||null);
+
+    mkChart('canvas-battery',{type:'line',data:{labels,datasets:[{
+      label:'Body Battery',data:vals,borderColor:c.accentLt,backgroundColor:c.bikeA,fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:c.accentLt,borderWidth:2,
+    }]},options:baseOpts(c,{
+      scales:{
+        x:{ticks:{color:c.muted,font:{family:"'DM Sans',sans-serif",size:10},maxTicksLimit:8},grid:{display:false},border:{color:c.border}},
+        y:{min:0,max:100,ticks:{callback:v=>`${v}`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border}},
+      },
+    })});
+
+    const latest = withBB.at(-1)?.bodyBattery;
+    const avg7   = (withBB.slice(-7).reduce((s,g)=>s+g.bodyBattery,0)/Math.min(withBB.length,7)).toFixed(0);
+    setInsight('insight-battery',`Latest body battery: ${latest}/100. 7-day avg: ${avg7}/100. ${avg7>70?'High energy reserves — ready to train hard.':avg7>45?'Moderate reserves — mix intensity with recovery.':'Low reserves — prioritise rest and easy sessions.'}`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 12 — Stress vs Next-Day HRV correlation
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildStressHRV(garmin, c) {
+    clearOverlay('wrap-stress-hrv');
+    const pts = [];
+    for (let i=0; i<garmin.length-1; i++) {
+      const today = garmin[i], tomorrow = garmin[i+1];
+      if (today.stress!=null && tomorrow.hrv!=null) pts.push({x:today.stress,y:tomorrow.hrv,date:today.date});
+    }
+    if (pts.length < 3) { showEmpty('wrap-stress-hrv','Need stress + HRV logs on consecutive days to show correlation.'); setInsight('insight-stress-hrv',''); return; }
+
+    mkChart('canvas-stress-hrv',{type:'scatter',data:{datasets:[{
+      label:'Stress → next HRV',
+      data:pts.map(p=>({x:p.x,y:p.y})),
+      pointBackgroundColor:c.runA.replace('.18','0.7'),pointBorderColor:c.run,pointRadius:6,pointHoverRadius:8,
+    }]},options:baseOpts(c,{
+      scales:{
+        x:{ticks:{callback:v=>`${v}`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border},title:{display:true,text:'daily stress score',color:c.muted,font:{size:10}}},
+        y:{ticks:{callback:v=>`${v}ms`,color:c.muted,font:{family:"'DM Sans',sans-serif",size:11}},grid:{color:c.grid},border:{color:c.border},title:{display:true,text:'next-day HRV',color:c.muted,font:{size:10}}},
+      },
+      plugins:{tooltip:{callbacks:{label:ctx=>`Stress ${ctx.parsed.x} → HRV ${ctx.parsed.y}ms (${fmtDate(pts[ctx.dataIndex].date)})`}}},
+    })});
+
+    const reg = linReg(pts.map(p=>p.x), pts.map(p=>p.y));
+    const direction = reg&&reg.slope<-0.3?'negative (higher stress → lower HRV)':reg&&reg.slope>0.3?'positive (unexpected — check data)':'weak — stress alone may not predict your HRV';
+    setInsight('insight-stress-hrv',`Correlation direction: ${direction}. ${pts.length} data points.`);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART 13 — Race Readiness (custom HTML dashboard)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildRaceReadiness(acts, garmin) {
+    const wrap = $('raceContent'); wrap.innerHTML='';
+
+    // Load saved targets
+    const tgt = store.get('graph_targets') || { run:20, bike:80, swim:3000, longrun:16, longride:80 };
+    const cfg = store.get('tb_settings') || {};
+    const raceDate = cfg.raceDate;
+
+    // This week's activities
+    const thisBkt = weekBuckets(1)[0];
+    const weekActs = inWeek(acts, thisBkt);
+    const thisRun  = weekActs.filter(a=>a.type==='Run').reduce((s,a)=>s+M2MI(a.distance),0);
+    const thisBike = weekActs.filter(a=>a.type==='Ride').reduce((s,a)=>s+M2MI(a.distance),0);
+    const thisSwim = weekActs.filter(a=>a.type==='Swim').reduce((s,a)=>s+M2YD(a.distance),0);
+
+    // Long workouts this week
+    const longRunMi  = weekActs.filter(a=>a.type==='Run').reduce((m,a)=>Math.max(m,M2MI(a.distance)),0);
+    const longRideMi = weekActs.filter(a=>a.type==='Ride').reduce((m,a)=>Math.max(m,M2MI(a.distance)),0);
+
+    // Compute readiness score
+    const volScore  = Math.min(35, ((thisRun/tgt.run*0.4 + thisBike/tgt.bike*0.4 + thisSwim/tgt.swim*0.2)*35));
+    const weeks8 = weekBuckets(8);
+    const activeWeeks = weeks8.filter(b=>inWeek(acts,b).length>0).length;
+    const conScore  = Math.min(25, (activeWeeks/8)*25);
+    const withHRV   = garmin.filter(g=>g.hrv);
+    const baseline  = withHRV.length ? withHRV.reduce((s,g)=>s+g.hrv,0)/withHRV.length : 0;
+    const recent7   = withHRV.slice(-7);
+    const recentHRV = recent7.length ? recent7.reduce((s,g)=>s+g.hrv,0)/recent7.length : baseline;
+    const recScore  = baseline ? Math.min(25, (recentHRV/baseline)*25) : 12.5;
+    const longScore = Math.min(15, (longRunMi>=tgt.longrun?7.5:longRunMi/tgt.longrun*7.5) + (longRideMi>=tgt.longride?7.5:longRideMi/tgt.longride*7.5));
+    const score     = Math.round(volScore+conScore+recScore+longScore);
+    const badge     = score>=80?'Strong':'On Track':score>=60?'On Track':'Needs Attention';
+    const badgeClr  = score>=80?'#5cb85c':score>=60?'#e8a838':'#d9534f';
+
+    // Recommendations
+    const recs=[];
+    if (thisRun  < tgt.run  *0.7) recs.push(`Run volume at ${thisRun.toFixed(1)}mi — aim for ${tgt.run}mi this week.`);
+    if (thisBike < tgt.bike *0.7) recs.push(`Bike volume at ${thisBike.toFixed(1)}mi — target ${tgt.bike}mi/week.`);
+    if (longRunMi < tgt.longrun)  recs.push(`No long run ≥${tgt.longrun}mi this week — schedule one before the weekend.`);
+    if (longRideMi< tgt.longride) recs.push(`Long ride was ${longRideMi.toFixed(1)}mi — push toward ${tgt.longride}mi.`);
+    if (recentHRV < baseline*0.9 && baseline) recs.push(`HRV is down (${recentHRV.toFixed(0)} vs ${baseline.toFixed(0)}ms baseline) — consider an easy day.`);
+    if (activeWeeks < 6) recs.push(`Only ${activeWeeks}/8 recent weeks have activity — consistency is key for Ironman prep.`);
+    if (!recs.length) recs.push('Training looks solid this week. Stay consistent and nail your long sessions!');
+
+    // Countdown
+    const days = raceDate ? daysUntil(raceDate) : null;
+    const weeksOut = days ? (days/7).toFixed(1) : null;
+
+    const progBar = (val, max, color) => {
+      const pct = Math.min(100, val/max*100).toFixed(0);
+      return `<div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div>`;
+    };
+
+    wrap.innerHTML = `
+      <div class="rd-card">
+        <div class="rd-top">
+          <div>
+            <div class="rd-race-name">Ironman Jacksonville</div>
+            <div class="rd-race-sub">${days!=null?`${days} days away · Week ${Math.floor((days>0?days:0)/7)+1} from the back`:'Set race date in Training settings'}</div>
+          </div>
+          <div class="rd-score-block">
+            <div class="rd-score-label">Readiness</div>
+            <div class="rd-score-val" style="color:${badgeClr}">${acts.length?score:'—'}</div>
+            <div class="rd-score-badge">${acts.length?badge:'No data'} / 100</div>
+          </div>
+        </div>
+
+        <div class="rd-section">
+          <div class="rd-section-title">This Week vs Targets</div>
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-sport">🏃 Run</span><span>${thisRun.toFixed(1)} / ${tgt.run} mi</span></div>
+            ${progBar(thisRun, tgt.run, '#9b6448')}
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-sport">🚴 Bike</span><span>${thisBike.toFixed(1)} / ${tgt.bike} mi</span></div>
+            ${progBar(thisBike, tgt.bike, '#c49468')}
+          </div>
+          <div class="prog-item">
+            <div class="prog-header"><span class="prog-sport">🏊 Swim</span><span>${thisSwim} / ${tgt.swim} yds</span></div>
+            ${progBar(thisSwim, tgt.swim, '#5da4c4')}
+          </div>
+        </div>
+
+        <div class="rd-section">
+          <div class="rd-section-title">Long Workouts This Week</div>
+          <div class="lw-list">
+            <div class="lw-item">
+              <span class="lw-icon">${longRunMi>=tgt.longrun?'✅':'⬜'}</span>
+              <div><div class="lw-text">Long Run: ${longRunMi>0?longRunMi.toFixed(1)+'mi':'none logged'}</div><div class="lw-sub">Target: ${tgt.longrun}+ mi</div></div>
+            </div>
+            <div class="lw-item">
+              <span class="lw-icon">${longRideMi>=tgt.longride?'✅':'⬜'}</span>
+              <div><div class="lw-text">Long Ride: ${longRideMi>0?longRideMi.toFixed(1)+'mi':'none logged'}</div><div class="lw-sub">Target: ${tgt.longride}+ mi</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rd-section">
+          <div class="rd-section-title">Recommendations</div>
+          <ul class="rd-recs">${recs.map(r=>`<li>${r}</li>`).join('')}</ul>
+        </div>
+
+        <div class="targets-wrap">
+          <div class="rd-section-title">Weekly Targets (edit to customise)</div>
+          <div class="targets-grid">
+            <div class="settings-field"><label>Run (mi/wk)</label><input type="number" id="tgt-run" value="${tgt.run}" min="0" /></div>
+            <div class="settings-field"><label>Bike (mi/wk)</label><input type="number" id="tgt-bike" value="${tgt.bike}" min="0" /></div>
+            <div class="settings-field"><label>Swim (yds/wk)</label><input type="number" id="tgt-swim" value="${tgt.swim}" min="0" /></div>
+            <div class="settings-field"><label>Long Run (mi)</label><input type="number" id="tgt-longrun" value="${tgt.longrun}" min="0" /></div>
+            <div class="settings-field"><label>Long Ride (mi)</label><input type="number" id="tgt-longride" value="${tgt.longride}" min="0" /></div>
+          </div>
+          <button class="btn-primary" id="saveTargetsBtn">Save Targets</button>
+        </div>
+      </div>
+    `;
+
+    $('saveTargetsBtn').addEventListener('click', ()=>{
+      store.set('graph_targets',{
+        run:     +$('tgt-run').value||20,
+        bike:    +$('tgt-bike').value||80,
+        swim:    +$('tgt-swim').value||3000,
+        longrun: +$('tgt-longrun').value||16,
+        longride:+$('tgt-longride').value||80,
+      });
+      buildRaceReadiness(acts, garmin);
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TAB SYSTEM
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  let activeTab = 'fitness';
+  const rendered = new Set();
+
+  function setupGrid(gridId, cards) {
+    const grid = $(gridId);
+    if (!grid || grid.hasChildNodes()) return; // already built
+    cards.forEach(([id, title, opts]) => grid.appendChild(makeCard(id, title, opts)));
+  }
+
+  function renderTab(tab) {
+    const acts   = getActivities();
+    const garmin = getGarminHistory(90);
+    const c      = clr();
+
+    if (tab === 'fitness') {
+      setupGrid('grid-fitness',[
+        ['weekly-vol', 'Weekly Training Volume — last 12 weeks',    {wide:true}],
+        ['cumulative', 'Cumulative Year-to-Date Volume by Sport',   {wide:true}],
+        ['load',       'Training Load (TSS estimate) — last 12 weeks', {wide:true}],
+      ]);
+      buildWeeklyVolume(acts, c);
+      buildCumulative(acts, c);
+      buildTrainingLoad(acts, c);
+    }
+    else if (tab === 'running') {
+      setupGrid('grid-running',[
+        ['pace-trend', 'Pace Trend — all runs (color = distance)',  {}],
+        ['hr-pace',    'HR vs Pace — aerobic efficiency over time', {}],
+        ['long-run',   'Long Run Progress — last 16 weeks',         {wide:true}],
+      ]);
+      buildPaceTrend(acts, c);
+      buildHRvsPace(acts, c);
+      buildLongRun(acts, c);
+    }
+    else if (tab === 'cycling') {
+      setupGrid('grid-cycling',[
+        ['power',      'Power / Effort Trend',           {}],
+        ['ride-dist',  'Ride Distance Distribution',     {}],
+      ]);
+      buildPowerTrend(acts, c);
+      buildRideDistribution(acts, c);
+    }
+    else if (tab === 'recovery') {
+      setupGrid('grid-recovery',[
+        ['hrv',         'HRV Trend — last 30 days',            {wide:true}],
+        ['sleep',       'Sleep Score',                         {}],
+        ['battery',     'Body Battery',                        {}],
+        ['stress-hrv',  'Stress vs Next-Day HRV Correlation',  {wide:true}],
+      ]);
+      buildHRVTrend(garmin, c);
+      buildSleepScore(garmin, c);
+      buildBodyBattery(garmin, c);
+      buildStressHRV(garmin, c);
+    }
+    else if (tab === 'race') {
+      buildRaceReadiness(acts, garmin);
+    }
+
+    rendered.add(tab);
+  }
+
+  function switchTab(tab) {
+    activeTab = tab;
+
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tab);
+      btn.setAttribute('aria-selected', String(btn.dataset.tab === tab));
+    });
+    // Show/hide panels
+    document.querySelectorAll('.tab-panel').forEach(p => {
+      const isActive = p.id === `tab-${tab}`;
+      p.classList.toggle('active', isActive);
+      p.hidden = !isActive;
+    });
+
+    renderTab(tab);
+  }
+
+  function rerenderAll() {
+    // Destroy all Chart.js instances
+    Object.values(chartReg).forEach(c=>c.destroy());
+    Object.keys(chartReg).forEach(k=>delete chartReg[k]);
+    // Clear grids so setupGrid will rebuild them
+    ['grid-fitness','grid-running','grid-cycling','grid-recovery'].forEach(id=>{
+      const g=$(id); if(g) g.innerHTML='';
+    });
+    rendered.clear();
+    renderTab(activeTab);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DATA BAR
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function updateDataBar() {
+    const ext = store.get('strava_extended');
+    const reg = store.get('strava_cache');
+    const src = (ext?.activities?.length||0) >= (reg?.activities?.length||0) ? ext : reg;
+    const n   = src?.activities?.length||0;
+
+    const dot  = $('stravaDot'), chip = $('stravaChip');
+    if (n) { dot.className='data-dot ok'; chip.textContent=`Strava: ${n} activities`; }
+    else   { dot.className='data-dot';    chip.textContent='Strava: no data'; }
+
+    const garmin = getGarminHistory(90).filter(g=>g.hrv||g.sleepScore||g.bodyBattery);
+    $('garminChip').textContent = garmin.length ? `Garmin: ${garmin.length} daily logs` : 'Garmin: no logs';
+
+    const btn = $('loadHistoryBtn');
+    if (n) btn.textContent = `Refresh (${n} loaded)`;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LOAD 200 ACTIVITIES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async function loadFullHistory() {
+    const tokenData = store.get('strava_token');
+    if (!tokenData) { alert('Connect Strava first on the Training page.'); return; }
+
+    const btn = $('loadHistoryBtn');
+    btn.textContent='Loading…'; btn.disabled=true;
+
+    try {
+      const resp = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=200&page=1', {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      });
+      if (resp.status===401) throw new Error('Token expired — reconnect Strava on the Training page.');
+      if (!resp.ok) throw new Error(`Strava error ${resp.status}`);
+      const activities = await resp.json();
+      store.set('strava_extended', { activities, cachedAt: Date.now() });
+      updateDataBar();
+      rerenderAll();
+    } catch(err) {
+      alert(err.message);
+      btn.disabled=false;
+      btn.textContent='Load 200 activities';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SITE CHROME — theme, hamburger, back-to-top
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  (function initTheme() {
+    const saved = localStorage.getItem('theme');
+    const pref  = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved==='dark'||(! saved&&pref)) document.documentElement.setAttribute('data-theme','dark');
+    $('themeToggle').addEventListener('click', ()=>{
+      const dark = document.documentElement.getAttribute('data-theme')==='dark';
+      document.documentElement.setAttribute('data-theme', dark?'light':'dark');
+      localStorage.setItem('theme', dark?'light':'dark');
+      // Re-render charts with new colors after CSS has applied
+      setTimeout(rerenderAll, 40);
+    });
+  })();
+
+  (function initHamburger() {
+    const ham=$ ('hamburger'), sb=$('sidebar'), ov=$('sidebarOverlay');
+    const open =()=>{ sb.classList.add('open');    ov.classList.add('active');    ham.classList.add('open');    ham.setAttribute('aria-expanded','true');  };
+    const close=()=>{ sb.classList.remove('open'); ov.classList.remove('active'); ham.classList.remove('open'); ham.setAttribute('aria-expanded','false'); };
+    ham.addEventListener('click',()=>sb.classList.contains('open')?close():open());
+    ov.addEventListener('click',close);
+    window.addEventListener('resize',()=>{ if(window.innerWidth>=900) close(); });
+  })();
+
+  (function initBackToTop() {
+    const btn=$('backToTop');
+    window.addEventListener('scroll',()=>btn.classList.toggle('visible',scrollY>400),{passive:true});
+    btn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+  })();
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  (function init() {
+    // Tab bar clicks
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
+    });
+
+    // Load history button
+    $('loadHistoryBtn').addEventListener('click', loadFullHistory);
+
+    // Set Chart.js global font
+    Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+    // Data status
+    updateDataBar();
+
+    // Render initial tab
+    renderTab('fitness');
+  })();
+
+  </script>
+</body>
+</html>
