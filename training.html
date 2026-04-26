@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training Brain · Fernando Delgado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ────────────────────────────────────────────────────────────────
+       TRAINING BRAIN — page-specific styles
+       (Extends style.css; all CSS variables + base components are
+        inherited from there.)
+    ──────────────────────────────────────────────────────────────── */
+
+    /* Slightly wider content column for the chat interface */
+    @media (min-width: 900px) {
+      .main { max-width: 780px; }
+    }
+
+    /* ── Page header ──────────────────────────────────────────────── */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--sp-lg);
+    }
+    .page-title {
+      font-size: var(--fz-2xl);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+    .page-subtitle {
+      font-size: var(--fz-sm);
+      color: var(--clr-muted);
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+    .btn-settings {
+      font-size: var(--fz-sm);
+      color: var(--clr-muted);
+      border: 1px solid var(--clr-border);
+      border-radius: 4px;
+      padding: 0.35rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+      cursor: pointer;
+      background: none;
+      font-family: inherit;
+      transition: color var(--t-fast), border-color var(--t-fast), background-color var(--t-fast);
+    }
+    .btn-settings:hover {
+      color: var(--clr-text);
+      background-color: var(--clr-hover);
+      border-color: var(--clr-accent-lt);
+    }
+    .btn-settings.active {
+      color: var(--clr-accent);
+      border-color: var(--clr-accent);
+    }
+
+    /* ── Settings panel ───────────────────────────────────────────── */
+    .settings-panel {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 6px;
+      padding: var(--sp-md);
+      margin-bottom: var(--sp-lg);
+      display: none;
+      transition: background-color var(--t-slow), border-color var(--t-slow);
+    }
+    .settings-panel.open { display: block; }
+
+    .settings-panel-title {
+      font-size: var(--fz-xs);
+      font-weight: 500;
+      color: var(--clr-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--sp-sm);
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-sm);
+      margin-bottom: var(--sp-sm);
+    }
+    @media (max-width: 580px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+
+    .settings-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .settings-field label {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .settings-field input {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-sm);
+      color: var(--clr-text);
+      background: var(--clr-bg);
+      border: 1px solid var(--clr-border);
+      border-radius: 4px;
+      padding: 0.45rem 0.7rem;
+      transition: border-color var(--t-fast), background-color var(--t-slow);
+      width: 100%;
+    }
+    .settings-field input:focus {
+      outline: none;
+      border-color: var(--clr-accent);
+    }
+
+    .settings-note {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      font-style: italic;
+      margin-top: 0.4rem;
+      line-height: 1.6;
+    }
+    .settings-note code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85em;
+      background: var(--clr-hover);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+    .settings-note a { color: var(--clr-accent); }
+
+    .settings-actions {
+      display: flex;
+      gap: var(--sp-sm);
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: var(--sp-sm);
+      padding-top: var(--sp-sm);
+      border-top: 1px solid var(--clr-border);
+    }
+
+    /* Primary / secondary buttons */
+    .btn-primary {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-sm);
+      font-weight: 500;
+      color: var(--clr-bg);
+      background: var(--clr-accent);
+      border: none;
+      border-radius: 4px;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      transition: opacity var(--t-fast);
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.4; cursor: default; }
+
+    .btn-secondary {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-sm);
+      color: var(--clr-muted);
+      border: 1px solid var(--clr-border);
+      border-radius: 4px;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      background: none;
+      transition: color var(--t-fast), border-color var(--t-fast);
+    }
+    .btn-secondary:hover {
+      color: var(--clr-text);
+      border-color: var(--clr-muted);
+    }
+
+    /* ── Connection status pills ──────────────────────────────────── */
+    .connection-status {
+      display: flex;
+      gap: var(--sp-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--sp-lg);
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      transition: background-color var(--t-slow), border-color var(--t-slow);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--clr-border);
+      flex-shrink: 0;
+      transition: background-color var(--t-base);
+    }
+    .status-dot.connected { background: #5cb85c; }
+    .status-dot.manual    { background: var(--clr-accent-lt); }
+
+    /* ── Dashboard metric cards ───────────────────────────────────── */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-sm);
+      margin-bottom: var(--sp-lg);
+    }
+    @media (max-width: 700px) {
+      .dashboard-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 400px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    .metric-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 6px;
+      padding: 0.85rem var(--sp-md);
+      transition: background-color var(--t-slow), border-color var(--t-slow);
+    }
+    .metric-label {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 0.4rem;
+    }
+    .metric-value {
+      font-size: var(--fz-xl);
+      font-weight: 600;
+      color: var(--clr-text);
+      line-height: 1.15;
+    }
+    .metric-value.accent { color: var(--clr-accent); }
+    .metric-sub {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      margin-top: 0.3rem;
+      line-height: 1.5;
+    }
+
+    /* ── Garmin / daily log ───────────────────────────────────────── */
+    .garmin-section {
+      margin-bottom: var(--sp-lg);
+      border: 1px solid var(--clr-border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: border-color var(--t-slow);
+    }
+    .garmin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem var(--sp-md);
+      background: var(--clr-surface);
+      cursor: pointer;
+      user-select: none;
+      transition: background-color var(--t-fast);
+    }
+    .garmin-header:hover { background: var(--clr-hover); }
+    .garmin-header h3 {
+      font-size: var(--fz-sm);
+      font-weight: 600;
+      color: var(--clr-text);
+    }
+    .garmin-header-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-sm);
+    }
+    .garmin-date-tag {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      font-style: italic;
+    }
+    .garmin-chevron {
+      font-size: 0.75rem;
+      color: var(--clr-muted);
+      transition: transform 0.25s ease;
+    }
+    .garmin-section.open .garmin-chevron { transform: rotate(180deg); }
+
+    .garmin-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .garmin-section.open .garmin-body { max-height: 600px; }
+
+    .garmin-form-inner {
+      padding: var(--sp-md);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-sm);
+    }
+    @media (max-width: 580px) {
+      .garmin-form-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    .garmin-actions {
+      padding: 0 var(--sp-md) var(--sp-md);
+      display: flex;
+      gap: var(--sp-sm);
+      align-items: center;
+    }
+    .garmin-saved-msg {
+      font-size: var(--fz-xs);
+      color: #5cb85c;
+      display: none;
+    }
+    .garmin-saved-msg.show { display: block; }
+
+    /* ── API warning banner ───────────────────────────────────────── */
+    .api-warning {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-left: 3px solid var(--clr-accent);
+      border-radius: 4px;
+      padding: 0.75rem var(--sp-md);
+      font-size: var(--fz-sm);
+      color: var(--clr-muted);
+      margin-bottom: var(--sp-md);
+      display: none;
+      line-height: 1.6;
+      transition: background-color var(--t-slow);
+    }
+    .api-warning.show { display: block; }
+    .api-warning a { color: var(--clr-accent); }
+
+    /* ── Chat section ─────────────────────────────────────────────── */
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--clr-border);
+      margin-bottom: var(--sp-md);
+    }
+    .chat-header h2 {
+      font-size: var(--fz-lg);
+      font-weight: 600;
+      color: var(--clr-text);
+    }
+    .btn-clear-chat {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0;
+      transition: color var(--t-fast);
+    }
+    .btn-clear-chat:hover { color: var(--clr-accent); }
+
+    .chat-messages {
+      min-height: 180px;
+      max-height: 60vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-sm);
+      padding: 2px 0;
+      margin-bottom: var(--sp-sm);
+      scroll-behavior: smooth;
+    }
+
+    /* Empty state */
+    .chat-empty {
+      text-align: center;
+      padding: var(--sp-lg) var(--sp-md);
+      color: var(--clr-muted);
+      font-style: italic;
+      font-size: var(--fz-sm);
+    }
+    .chat-empty-title {
+      font-size: var(--fz-md);
+      font-style: normal;
+      font-weight: 500;
+      color: var(--clr-text);
+      margin-bottom: 0.35rem;
+    }
+    .chat-starters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: var(--sp-sm);
+    }
+    .chat-starter-btn {
+      font-family: var(--ff-sans);
+      font-size: var(--fz-xs);
+      color: var(--clr-accent);
+      border: 1px solid var(--clr-accent-lt);
+      border-radius: 20px;
+      padding: 0.3rem 0.8rem;
+      cursor: pointer;
+      background: none;
+      transition: background-color var(--t-fast);
+    }
+    .chat-starter-btn:hover { background-color: var(--clr-hover); }
+
+    /* Messages */
+    .message {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      max-width: 92%;
+    }
+    .message--user      { align-self: flex-end;  flex-direction: row-reverse; }
+    .message--assistant { align-self: flex-start; }
+
+    .message-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .message--user .message-avatar {
+      background: var(--clr-accent);
+      color: var(--clr-bg);
+    }
+    .message--assistant .message-avatar {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      color: var(--clr-muted);
+      font-size: 0.85rem;
+    }
+
+    .message-bubble {
+      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      font-size: var(--fz-sm);
+      line-height: 1.75;
+    }
+    .message--user .message-bubble {
+      background: var(--clr-accent);
+      color: var(--clr-bg);
+      border-bottom-right-radius: 3px;
+    }
+    .message--assistant .message-bubble {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      color: var(--clr-text);
+      border-bottom-left-radius: 3px;
+      transition: background-color var(--t-slow), border-color var(--t-slow);
+    }
+
+    /* Markdown inside bubbles */
+    .message-bubble p               { margin-bottom: 0.5em; }
+    .message-bubble p:last-child    { margin-bottom: 0; }
+    .message-bubble strong          { font-weight: 600; }
+    .message-bubble em              { font-style: italic; }
+    .message-bubble h3,
+    .message-bubble h4              { font-weight: 600; margin: 0.6em 0 0.3em; }
+    .message-bubble ul,
+    .message-bubble ol              { padding-left: 1.4em; margin: 0.3em 0; }
+    .message-bubble li              { margin-bottom: 0.2em; }
+    .message-bubble code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85em;
+      background: rgba(0,0,0,0.08);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+    .message--user .message-bubble code { background: rgba(255,255,255,0.2); }
+
+    /* Thinking animation */
+    .message-thinking {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 0.75rem 0.9rem;
+    }
+    .thinking-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--clr-muted);
+      animation: thinking-bounce 1.2s ease-in-out infinite;
+    }
+    .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes thinking-bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30%            { transform: translateY(-5px); }
+    }
+
+    /* ── Chat input ───────────────────────────────────────────────── */
+    .chat-input-wrap {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 8px;
+      padding: 0.5rem 0.5rem 0.5rem 0.85rem;
+      transition: border-color var(--t-fast), background-color var(--t-slow);
+    }
+    .chat-input-wrap:focus-within { border-color: var(--clr-accent); }
+
+    #chatInput {
+      flex: 1;
+      font-family: var(--ff-sans);
+      font-size: var(--fz-sm);
+      color: var(--clr-text);
+      background: none;
+      border: none;
+      outline: none;
+      resize: none;
+      line-height: 1.6;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    #chatInput::placeholder { color: var(--clr-muted); }
+
+    .btn-send {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      background: var(--clr-accent);
+      color: var(--clr-bg);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: opacity var(--t-fast);
+    }
+    .btn-send:hover    { opacity: 0.85; }
+    .btn-send:disabled { opacity: 0.35; cursor: default; }
+    .btn-send svg      { width: 14px; height: 14px; }
+
+    .chat-hint {
+      font-size: var(--fz-xs);
+      color: var(--clr-muted);
+      text-align: right;
+      margin-top: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── THEME TOGGLE ─────────────────────────────────────────────────────── -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
+  <!-- ─── HAMBURGER ───────────────────────────────────────────────────────── -->
+  <button class="hamburger" id="hamburger" aria-label="Open navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- ─── SIDEBAR ─────────────────────────────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar" aria-label="Site navigation">
+    <a href="index.html" class="sidebar-logo">FD</a>
+    <ul class="nav-links" role="list">
+      <li><a href="index.html#about"    class="nav-link">About</a></li>
+      <li><a href="index.html#posts"    class="nav-link">Posts</a></li>
+      <li><a href="index.html#projects" class="nav-link">Projects</a></li>
+      <li><a href="index.html#resume"   class="nav-link">Resume</a></li>
+      <li><a href="index.html#photos"   class="nav-link">Photos</a></li>
+      <li><a href="training.html"       class="nav-link active">Training</a></li>
+    </ul>
+  </nav>
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <!-- ─── MAIN CONTENT ────────────────────────────────────────────────────── -->
+  <main class="main" id="main">
+
+    <!-- ── Page header ── -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Training Brain</h1>
+        <p class="page-subtitle">AI-powered triathlon coach — powered by Claude</p>
+      </div>
+      <button class="btn-settings" id="settingsToggle" aria-expanded="false">
+        <!-- Gear icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Settings
+      </button>
+    </div>
+
+    <!-- ── Settings panel (hidden by default) ── -->
+    <div class="settings-panel" id="settingsPanel" aria-hidden="true">
+      <p class="settings-panel-title">Configuration</p>
+
+      <div class="settings-grid">
+        <div class="settings-field">
+          <label for="apiKey">Anthropic API Key</label>
+          <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="settings-field">
+          <label for="raceDate">Race Date</label>
+          <input type="date" id="raceDate" />
+        </div>
+        <div class="settings-field">
+          <label for="stravaClientId">Strava Client ID</label>
+          <input type="text" id="stravaClientId" placeholder="e.g. 12345" autocomplete="off" />
+        </div>
+        <div class="settings-field">
+          <label for="stravaClientSecret">Strava Client Secret</label>
+          <input type="password" id="stravaClientSecret" placeholder="••••••••" autocomplete="off" spellcheck="false" />
+        </div>
+      </div>
+
+      <p class="settings-note">
+        Get Strava API credentials at
+        <a href="https://www.strava.com/settings/api" target="_blank" rel="noopener">strava.com/settings/api</a>.
+        Set the <em>Authorization Callback Domain</em> to
+        <code id="stravaCallbackDomain">your-domain</code>.
+        All keys are stored only in your browser's localStorage — never sent anywhere except the respective APIs.
+      </p>
+
+      <div class="settings-actions">
+        <button class="btn-primary" id="saveSettings">Save Settings</button>
+        <button class="btn-primary" id="connectStrava" style="background:#FC4C02;">
+          Connect Strava
+        </button>
+        <button class="btn-secondary" id="disconnectStrava" style="display:none;">
+          Disconnect Strava
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Connection status ── -->
+    <div class="connection-status" role="status" aria-live="polite">
+      <div class="status-pill">
+        <div class="status-dot" id="stravaStatusDot"></div>
+        <span id="stravaStatusText">Strava: not connected</span>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot manual"></div>
+        <span>Garmin: manual log</span>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot" id="claudeStatusDot"></div>
+        <span id="claudeStatusText">Claude: no API key</span>
+      </div>
+    </div>
+
+    <!-- ── Dashboard metric cards ── -->
+    <div class="dashboard-grid">
+
+      <div class="metric-card">
+        <div class="metric-label">Last Activity</div>
+        <div class="metric-value" id="metricLastName" style="font-size:var(--fz-md);">—</div>
+        <div class="metric-sub" id="metricLastSub">Connect Strava to load</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">HRV Last Night</div>
+        <div class="metric-value accent" id="metricHRV">—</div>
+        <div class="metric-sub" id="metricHRVSub">Log below to update</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Weekly Volume</div>
+        <div class="metric-value" id="metricWeekly">—</div>
+        <div class="metric-sub" id="metricWeeklySub">Connect Strava to load</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Days to Race</div>
+        <div class="metric-value accent" id="metricDays">—</div>
+        <div class="metric-sub" id="metricRaceName">Set race date in settings</div>
+      </div>
+
+    </div>
+
+    <!-- ── Garmin / daily health log ── -->
+    <div class="garmin-section" id="garminSection">
+      <div class="garmin-header" id="garminToggle" role="button" tabindex="0" aria-expanded="false">
+        <h3>Daily Health Log <span style="font-weight:400;color:var(--clr-muted);">— Garmin / manual</span></h3>
+        <div class="garmin-header-meta">
+          <span class="garmin-date-tag" id="garminDateLabel"></span>
+          <span class="garmin-chevron" aria-hidden="true">▾</span>
+        </div>
+      </div>
+      <div class="garmin-body" id="garminBody" aria-hidden="true">
+        <div class="garmin-form-inner">
+          <div class="settings-field">
+            <label for="gHRV">HRV (ms)</label>
+            <input type="number" id="gHRV" placeholder="e.g. 65" min="0" max="300" />
+          </div>
+          <div class="settings-field">
+            <label for="gRHR">Resting HR (bpm)</label>
+            <input type="number" id="gRHR" placeholder="e.g. 48" min="20" max="150" />
+          </div>
+          <div class="settings-field">
+            <label for="gBodyBattery">Body Battery</label>
+            <input type="number" id="gBodyBattery" placeholder="0–100" min="0" max="100" />
+          </div>
+          <div class="settings-field">
+            <label for="gSleepScore">Sleep Score</label>
+            <input type="number" id="gSleepScore" placeholder="0–100" min="0" max="100" />
+          </div>
+          <div class="settings-field">
+            <label for="gStress">Avg Stress</label>
+            <input type="number" id="gStress" placeholder="0–100" min="0" max="100" />
+          </div>
+          <div class="settings-field">
+            <label for="gVO2Max">VO2 Max (run)</label>
+            <input type="number" id="gVO2Max" placeholder="e.g. 52" min="20" max="90" />
+          </div>
+        </div>
+        <div class="garmin-actions">
+          <button class="btn-primary" id="saveGarmin">Save Today's Log</button>
+          <span class="garmin-saved-msg" id="garminSavedMsg">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── API key warning ── -->
+    <div class="api-warning" id="apiWarning" role="alert">
+      ⚠ No Anthropic API key set. Open <strong>Settings</strong> above and paste your key to start chatting.
+      Get one free at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>.
+    </div>
+
+    <!-- ── Chat ── -->
+    <div class="chat-header">
+      <h2>Ask Your Coach</h2>
+      <button class="btn-clear-chat" id="clearChat">Clear chat</button>
+    </div>
+
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chat messages">
+      <div class="chat-empty" id="chatEmpty">
+        <div class="chat-empty-title">What's on your training mind?</div>
+        <div>Your data + Claude = smart, personalised coaching.</div>
+        <div class="chat-starters" id="chatStarters">
+          <button class="chat-starter-btn" data-prompt="How is my training load looking this week?">Training load this week</button>
+          <button class="chat-starter-btn" data-prompt="Based on my recent activities, what should I focus on today?">What to do today</button>
+          <button class="chat-starter-btn" data-prompt="How is my race preparation going for Ironman Jacksonville?">Race prep check-in</button>
+          <button class="chat-starter-btn" data-prompt="Am I recovering well based on my HRV and sleep data?">Recovery check</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-wrap" id="chatInputWrap">
+      <textarea
+        id="chatInput"
+        placeholder="Ask about training, recovery, race prep…"
+        rows="1"
+        aria-label="Chat message input"
+      ></textarea>
+      <button class="btn-send" id="sendBtn" aria-label="Send message">
+        <!-- Paper-plane send icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <p class="chat-hint">Enter to send · Shift+Enter for new line</p>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top:var(--sp-xl);">
+      <span class="footer-copy">© 2025 Fernando Delgado</span>
+      <div class="footer-links">
+        <a href="index.html">← Back to site</a>
+      </div>
+    </footer>
+
+  </main><!-- /main -->
+
+  <!-- ─── BACK TO TOP ─────────────────────────────────────────────────────── -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TRAINING BRAIN SCRIPT
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <script>
+  'use strict';
+
+  // ── Config ─────────────────────────────────────────────────────────────────
+  const STRAVA_AUTH_URL  = 'https://www.strava.com/oauth/authorize';
+  const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
+  const STRAVA_API       = 'https://www.strava.com/api/v3';
+  const ANTHROPIC_API    = 'https://api.anthropic.com/v1/messages';
+  const CLAUDE_MODEL     = 'claude-sonnet-4-20250514';
+
+  // ── localStorage utility ────────────────────────────────────────────────────
+  const store = {
+    get : (k)    => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+    set : (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+    del : (k)    => localStorage.removeItem(k),
+  };
+
+  // ── DOM shorthand ───────────────────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+
+  // ── Module-level state ──────────────────────────────────────────────────────
+  let chatHistory  = [];   // [{role:'user'|'assistant', content: string}]
+  let isStreaming  = false;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // THEME + HAMBURGER + BACK-TO-TOP  (same logic as main site)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Theme
+  (function initTheme() {
+    const saved      = localStorage.getItem('theme');
+    const preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && preferDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    $('themeToggle').addEventListener('click', () => {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+      localStorage.setItem('theme', dark ? 'light' : 'dark');
+    });
+  })();
+
+  // Hamburger
+  (function initHamburger() {
+    const ham     = $('hamburger');
+    const sidebar = $('sidebar');
+    const overlay = $('sidebarOverlay');
+    const open  = () => { sidebar.classList.add('open');    overlay.classList.add('active');    ham.classList.add('open');    ham.setAttribute('aria-expanded', 'true');  };
+    const close = () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); ham.classList.remove('open'); ham.setAttribute('aria-expanded', 'false'); };
+    ham.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+    overlay.addEventListener('click', close);
+    window.addEventListener('resize', () => { if (window.innerWidth >= 900) close(); });
+  })();
+
+  // Back to top
+  (function initBackToTop() {
+    const btn = $('backToTop');
+    window.addEventListener('scroll', () => btn.classList.toggle('visible', window.scrollY > 400), { passive: true });
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  })();
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HELPERS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function todayKey() { return new Date().toISOString().slice(0, 10); }
+
+  function metersToMiles(m) { return (m / 1609.344).toFixed(1); }
+  function metersToYards(m) { return Math.round(m * 1.09361); }
+
+  function secsToPacePerMile(secs, distMeters) {
+    if (!distMeters || !secs) return null;
+    const secPerMile = secs / (distMeters / 1609.344);
+    const m = Math.floor(secPerMile / 60);
+    const s = Math.round(secPerMile % 60).toString().padStart(2, '0');
+    return `${m}:${s}/mi`;
+  }
+
+  function formatDate(isoStr) {
+    return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function daysUntil(dateStr) {
+    const target = new Date(dateStr);
+    const now    = new Date();
+    target.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+    return Math.ceil((target - now) / 86400000);
+  }
+
+  // Lightweight markdown → HTML renderer (subset: headings, lists, bold, italic, code)
+  function renderMarkdown(raw) {
+    if (!raw) return '';
+
+    // 1. Escape HTML
+    let text = raw
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // 2. Process line-by-line for block elements
+    const lines   = text.split('\n');
+    const out     = [];
+    let inUL      = false;
+
+    for (const line of lines) {
+      const h3 = line.match(/^###\s+(.+)/);
+      const h2 = line.match(/^##\s+(.+)/);
+      const h1 = line.match(/^#\s+(.+)/);
+      const li = line.match(/^[-*]\s+(.+)/);
+
+      if (h3 || h2 || h1) {
+        if (inUL) { out.push('</ul>'); inUL = false; }
+        out.push(`<h4>${(h3||h2||h1)[1]}</h4>`);
+      } else if (li) {
+        if (!inUL) { out.push('<ul>'); inUL = true; }
+        out.push(`<li>${li[1]}</li>`);
+      } else {
+        if (inUL) { out.push('</ul>'); inUL = false; }
+        out.push(line);
+      }
+    }
+    if (inUL) out.push('</ul>');
+
+    text = out.join('\n');
+
+    // 3. Inline formatting
+    text = text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,     '<em>$1</em>')
+      .replace(/`([^`]+)`/g,     '<code>$1</code>');
+
+    // 4. Paragraph splitting on double newlines
+    text = text
+      .split(/\n{2,}/)
+      .map(block => {
+        block = block.trim();
+        if (!block) return '';
+        if (/^<[huo]/.test(block)) return block; // already a block element
+        return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+      })
+      .filter(Boolean)
+      .join('\n');
+
+    return text;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SETTINGS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function loadSettingsUI() {
+    const s = store.get('tb_settings') || {};
+    if (s.apiKey)             $('apiKey').value             = s.apiKey;
+    if (s.raceDate)           $('raceDate').value           = s.raceDate;
+    if (s.stravaClientId)     $('stravaClientId').value     = s.stravaClientId;
+    if (s.stravaClientSecret) $('stravaClientSecret').value = s.stravaClientSecret;
+    $('stravaCallbackDomain').textContent = window.location.hostname || 'localhost';
+  }
+
+  function readSettingsFromUI() {
+    return {
+      apiKey            : $('apiKey').value.trim(),
+      raceDate          : $('raceDate').value,
+      stravaClientId    : $('stravaClientId').value.trim(),
+      stravaClientSecret: $('stravaClientSecret').value.trim(),
+    };
+  }
+
+  function saveSettings() {
+    const s = readSettingsFromUI();
+    store.set('tb_settings', s);
+    return s;
+  }
+
+  $('settingsToggle').addEventListener('click', () => {
+    const panel  = $('settingsPanel');
+    const btn    = $('settingsToggle');
+    const isOpen = panel.classList.toggle('open');
+    btn.classList.toggle('active', isOpen);
+    btn.setAttribute('aria-expanded', String(isOpen));
+    panel.setAttribute('aria-hidden',  String(!isOpen));
+  });
+
+  $('saveSettings').addEventListener('click', () => {
+    saveSettings();
+    updateStatusBadges();
+    updateDashboard();
+    const btn = $('saveSettings');
+    const orig = btn.textContent;
+    btn.textContent = 'Saved ✓';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // STATUS BADGES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function updateStatusBadges() {
+    const s     = store.get('tb_settings') || {};
+    const token = store.get('strava_token');
+
+    // Strava
+    if (token) {
+      $('stravaStatusDot').className  = 'status-dot connected';
+      $('stravaStatusText').textContent = 'Strava: connected';
+      $('disconnectStrava').style.display = 'inline-block';
+      $('connectStrava').style.display    = 'none';
+    } else {
+      $('stravaStatusDot').className  = 'status-dot';
+      $('stravaStatusText').textContent = 'Strava: not connected';
+      $('disconnectStrava').style.display = 'none';
+      $('connectStrava').style.display    = 'inline-block';
+    }
+
+    // Claude
+    if (s.apiKey) {
+      $('claudeStatusDot').className  = 'status-dot connected';
+      $('claudeStatusText').textContent = 'Claude: ready';
+      $('apiWarning').classList.remove('show');
+    } else {
+      $('claudeStatusDot').className  = 'status-dot';
+      $('claudeStatusText').textContent = 'Claude: no API key';
+      $('apiWarning').classList.add('show');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // STRAVA OAUTH + DATA
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  $('connectStrava').addEventListener('click', () => {
+    const s = saveSettings();
+    if (!s.stravaClientId) {
+      alert('Enter your Strava Client ID in settings first.');
+      return;
+    }
+    const redirectUri = window.location.href.split('?')[0];
+    const authUrl =
+      `${STRAVA_AUTH_URL}` +
+      `?client_id=${encodeURIComponent(s.stravaClientId)}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=activity:read_all,read_all` +
+      `&approval_prompt=auto`;
+    window.location.href = authUrl;
+  });
+
+  $('disconnectStrava').addEventListener('click', () => {
+    store.del('strava_token');
+    store.del('strava_cache');
+    updateStatusBadges();
+    updateDashboard();
+  });
+
+  // Called on page load when ?code= is present in the URL
+  async function handleStravaCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code   = params.get('code');
+    if (!code) return;
+
+    // Remove code from URL immediately (clean history)
+    window.history.replaceState({}, '', window.location.pathname);
+
+    const s = store.get('tb_settings') || {};
+    if (!s.stravaClientId || !s.stravaClientSecret) {
+      alert('Strava client ID / secret not found in settings. Please enter them and try connecting again.');
+      return;
+    }
+
+    $('stravaStatusText').textContent = 'Strava: exchanging token…';
+
+    try {
+      const resp = await fetch(STRAVA_TOKEN_URL, {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({
+          client_id    : s.stravaClientId,
+          client_secret: s.stravaClientSecret,
+          code,
+          grant_type   : 'authorization_code',
+        }),
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err?.message || `HTTP ${resp.status}`);
+      }
+      const data = await resp.json();
+      store.set('strava_token', {
+        access_token : data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at   : data.expires_at,
+        athlete      : data.athlete,
+      });
+      await fetchStravaData();
+    } catch (err) {
+      console.error('Strava OAuth error:', err);
+      $('stravaStatusText').textContent = 'Strava: auth error';
+      alert('Strava connection failed: ' + err.message);
+    }
+  }
+
+  async function ensureFreshToken() {
+    const token = store.get('strava_token');
+    if (!token) return null;
+    // Refresh if expiring within 5 minutes
+    if (Date.now() / 1000 < token.expires_at - 300) return token;
+
+    const s = store.get('tb_settings') || {};
+    try {
+      const resp = await fetch(STRAVA_TOKEN_URL, {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({
+          client_id    : s.stravaClientId,
+          client_secret: s.stravaClientSecret,
+          refresh_token: token.refresh_token,
+          grant_type   : 'refresh_token',
+        }),
+      });
+      if (!resp.ok) { store.del('strava_token'); return null; }
+      const data    = await resp.json();
+      const updated = { ...token, access_token: data.access_token, expires_at: data.expires_at };
+      store.set('strava_token', updated);
+      return updated;
+    } catch {
+      return token; // use existing if refresh fails
+    }
+  }
+
+  async function fetchStravaData() {
+    const token = await ensureFreshToken();
+    if (!token) { updateStatusBadges(); return; }
+
+    try {
+      const resp = await fetch(`${STRAVA_API}/athlete/activities?per_page=30`, {
+        headers: { Authorization: `Bearer ${token.access_token}` },
+      });
+      if (!resp.ok) throw new Error(`Activities fetch failed: ${resp.status}`);
+      const activities = await resp.json();
+      store.set('strava_cache', { activities, cachedAt: Date.now(), athlete: token.athlete });
+      updateStatusBadges();
+      updateDashboard();
+    } catch (err) {
+      console.error('Strava fetch error:', err);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GARMIN / DAILY HEALTH LOG
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function loadGarminUI() {
+    const data = store.get(`garmin_${todayKey()}`) || {};
+    if (data.hrv         != null) $('gHRV').value         = data.hrv;
+    if (data.rhr         != null) $('gRHR').value         = data.rhr;
+    if (data.bodyBattery != null) $('gBodyBattery').value = data.bodyBattery;
+    if (data.sleepScore  != null) $('gSleepScore').value  = data.sleepScore;
+    if (data.stress      != null) $('gStress').value      = data.stress;
+    if (data.vo2max      != null) $('gVO2Max').value      = data.vo2max;
+    $('garminDateLabel').textContent = new Date().toLocaleDateString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+    });
+  }
+
+  // Toggle garmin log open/closed
+  function toggleGarmin(forceOpen) {
+    const section = $('garminSection');
+    const body    = $('garminBody');
+    const toggle  = $('garminToggle');
+    const isOpen  = section.classList.contains('open');
+    const open    = forceOpen !== undefined ? forceOpen : !isOpen;
+    section.classList.toggle('open', open);
+    body.setAttribute('aria-hidden', String(!open));
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
+  $('garminToggle').addEventListener('click', () => toggleGarmin());
+  $('garminToggle').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGarmin(); }
+  });
+
+  $('saveGarmin').addEventListener('click', () => {
+    const data = {
+      hrv        : parseFloat($('gHRV').value)         || null,
+      rhr        : parseFloat($('gRHR').value)         || null,
+      bodyBattery: parseFloat($('gBodyBattery').value) || null,
+      sleepScore : parseFloat($('gSleepScore').value)  || null,
+      stress     : parseFloat($('gStress').value)      || null,
+      vo2max     : parseFloat($('gVO2Max').value)      || null,
+      savedAt    : new Date().toISOString(),
+    };
+    store.set(`garmin_${todayKey()}`, data);
+    updateDashboard();
+    const msg = $('garminSavedMsg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2200);
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DASHBOARD
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function updateDashboard() {
+    const s = store.get('tb_settings') || {};
+
+    // ── Days to race ────────────────────────────────────────────────
+    if (s.raceDate) {
+      const days = daysUntil(s.raceDate);
+      $('metricDays').textContent    = days > 0 ? days : (days === 0 ? '🎽 Today!' : 'Done!');
+      $('metricRaceName').textContent = 'Ironman Jacksonville';
+    } else {
+      $('metricDays').textContent     = '—';
+      $('metricRaceName').textContent = 'Set race date in settings';
+    }
+
+    // ── HRV / health ────────────────────────────────────────────────
+    const health = store.get(`garmin_${todayKey()}`);
+    if (health?.hrv) {
+      $('metricHRV').textContent    = `${health.hrv} ms`;
+      const parts = [];
+      if (health.rhr)        parts.push(`RHR ${health.rhr}`);
+      if (health.sleepScore) parts.push(`Sleep ${health.sleepScore}`);
+      if (health.bodyBattery != null) parts.push(`Battery ${health.bodyBattery}`);
+      $('metricHRVSub').textContent = parts.join(' · ') || 'Logged today';
+    } else {
+      $('metricHRV').textContent    = '—';
+      $('metricHRVSub').textContent = 'Log below to update';
+    }
+
+    // ── Strava: last activity + weekly volume ───────────────────────
+    const cache = store.get('strava_cache');
+    if (cache?.activities?.length) {
+      const acts = cache.activities;
+
+      // Last activity
+      const last    = acts[0];
+      const distStr = last.type === 'Swim'
+        ? `${metersToYards(last.distance)} yds`
+        : `${metersToMiles(last.distance)} mi`;
+      const paceStr = last.type === 'Run'
+        ? secsToPacePerMile(last.moving_time, last.distance)
+        : null;
+      $('metricLastName').textContent = last.name;
+      $('metricLastSub').textContent  =
+        `${last.type} · ${distStr}` +
+        (paceStr ? ` · ${paceStr}` : '') +
+        ` · ${formatDate(last.start_date)}`;
+
+      // Weekly volume (current Mon–today)
+      const now    = new Date();
+      const dow    = now.getDay();
+      const offset = dow === 0 ? 6 : dow - 1; // days since Monday
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - offset);
+      monday.setHours(0, 0, 0, 0);
+
+      const weekActs = acts.filter(a => new Date(a.start_date) >= monday);
+      let swimM = 0, bikeM = 0, runM = 0;
+      weekActs.forEach(a => {
+        if (a.type === 'Swim') swimM += a.distance;
+        if (a.type === 'Ride') bikeM += a.distance;
+        if (a.type === 'Run')  runM  += a.distance;
+      });
+
+      const volParts = [];
+      if (swimM) volParts.push(`${metersToYards(swimM)}y swim`);
+      if (bikeM) volParts.push(`${metersToMiles(bikeM)}mi bike`);
+      if (runM)  volParts.push(`${metersToMiles(runM)}mi run`);
+
+      $('metricWeekly').textContent    = weekActs.length ? `${weekActs.length} sessions` : '0';
+      $('metricWeeklySub').textContent = volParts.length ? volParts.join(' · ') : 'No workouts yet this week';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CLAUDE — system prompt builder
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function buildSystemPrompt() {
+    const s        = store.get('tb_settings') || {};
+    const today    = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const raceStr  = s.raceDate
+      ? new Date(s.raceDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      : 'TBD';
+    const daysLeft = s.raceDate ? daysUntil(s.raceDate) : null;
+
+    // Strava summary
+    let stravaSummary = 'Not connected — no activity data available.';
+    const cache = store.get('strava_cache');
+    if (cache?.activities?.length) {
+      const top10 = cache.activities.slice(0, 10);
+      stravaSummary = top10.map((a, i) => {
+        const dist  = a.type === 'Swim'
+          ? `${metersToYards(a.distance)} yds`
+          : `${metersToMiles(a.distance)} mi`;
+        const dur   = a.moving_time ? `${Math.round(a.moving_time / 60)} min` : '';
+        const hr    = a.average_heartrate ? `, avg HR ${Math.round(a.average_heartrate)} bpm` : '';
+        const pace  = a.type === 'Run' ? (secsToPacePerMile(a.moving_time, a.distance) ? `, ${secsToPacePerMile(a.moving_time, a.distance)}` : '') : '';
+        const watts = a.average_watts ? `, ${Math.round(a.average_watts)}w avg` : '';
+        const elev  = a.total_elevation_gain ? `, +${Math.round(a.total_elevation_gain * 3.28084)}ft` : '';
+        return `${i+1}. [${a.start_date.slice(0,10)}] ${a.type}: "${a.name}" — ${dist}${dur ? ', '+dur : ''}${pace}${hr}${watts}${elev}`;
+      }).join('\n');
+    }
+
+    // Garmin summary
+    let garminSummary = 'No health metrics logged today.';
+    const health = store.get(`garmin_${todayKey()}`);
+    if (health) {
+      const parts = [
+        health.hrv         != null ? `HRV: ${health.hrv} ms` : null,
+        health.rhr         != null ? `Resting HR: ${health.rhr} bpm` : null,
+        health.bodyBattery != null ? `Body Battery: ${health.bodyBattery}/100` : null,
+        health.sleepScore  != null ? `Sleep Score: ${health.sleepScore}/100` : null,
+        health.stress      != null ? `Avg Stress: ${health.stress}/100` : null,
+        health.vo2max      != null ? `VO2 Max (run): ${health.vo2max}` : null,
+      ].filter(Boolean);
+      if (parts.length) garminSummary = parts.join(', ');
+    }
+
+    return `You are a knowledgeable, data-driven triathlon training coach for Fernando Delgado.
+
+ATHLETE PROFILE:
+- Name: Fernando Delgado, San Francisco, CA
+- Goal race: Ironman Jacksonville on ${raceStr}${daysLeft != null ? ` (${daysLeft} days away)` : ''}
+- Background: completed Oceanside 70.3 (2025); building Trek OCLV 5500 as road/TT bike
+- Life context: works at AI startup (Narada AI), dog dad, turning 30 in June
+- Trains primarily in San Francisco (hills, coastal wind, sometimes on indoor trainer)
+
+TODAY: ${today}
+
+RECENT STRAVA ACTIVITIES (last 10 recorded):
+${stravaSummary}
+
+TODAY'S HEALTH METRICS:
+${garminSummary}
+
+COACHING GUIDELINES:
+- Be specific and data-driven — reference Fernando's actual numbers whenever relevant
+- Responses should be concise by default; go deep only when explicitly asked
+- Prioritise actionable guidance over general theory
+- Consider full-Ironman demands: periodisation, Z2 base, threshold work, long brick sessions, tapering
+- Factor in San Francisco terrain (steep hills, wind) and indoor trainer as context
+- When HRV/body battery is low, lean toward recovery/easy day recommendations
+- Use periodisation awareness: base → build → peak → taper relative to ${daysLeft != null ? `${daysLeft} days out` : 'race date'}
+- Respond conversationally with light markdown (bold key numbers, bullets for lists)`;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAT UI
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function appendMessage(role, content) {
+    // Remove empty-state placeholder on first message
+    const empty = $('chatEmpty');
+    if (empty) empty.remove();
+
+    const wrap   = document.createElement('div');
+    wrap.className = `message message--${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.setAttribute('aria-hidden', 'true');
+    avatar.textContent = role === 'user' ? 'FD' : '🧠';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+
+    if (role === 'user') {
+      bubble.textContent = content;
+    } else if (content === null) {
+      // Thinking animation
+      bubble.innerHTML =
+        '<div class="message-thinking" aria-label="Thinking">' +
+        '<div class="thinking-dot"></div>' +
+        '<div class="thinking-dot"></div>' +
+        '<div class="thinking-dot"></div>' +
+        '</div>';
+    } else {
+      bubble.innerHTML = renderMarkdown(content);
+    }
+
+    wrap.appendChild(avatar);
+    wrap.appendChild(bubble);
+    $('chatMessages').appendChild(wrap);
+    scrollToBottom();
+    return bubble;
+  }
+
+  function scrollToBottom() {
+    const el = $('chatMessages');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  async function sendMessage(text) {
+    text = text.trim();
+    if (!text || isStreaming) return;
+
+    const s = store.get('tb_settings') || {};
+    if (!s.apiKey) {
+      // Open settings and focus API key field
+      $('settingsPanel').classList.add('open');
+      $('settingsToggle').classList.add('active');
+      $('settingsToggle').setAttribute('aria-expanded', 'true');
+      $('settingsPanel').setAttribute('aria-hidden', 'false');
+      $('apiKey').focus();
+      return;
+    }
+
+    isStreaming = true;
+    $('sendBtn').disabled  = true;
+    $('chatInput').value   = '';
+    $('chatInput').style.height = '';
+
+    chatHistory.push({ role: 'user', content: text });
+    appendMessage('user', text);
+
+    // Show thinking indicator
+    const thinkBubble = appendMessage('assistant', null);
+
+    try {
+      const resp = await fetch(ANTHROPIC_API, {
+        method : 'POST',
+        headers: {
+          'Content-Type'                            : 'application/json',
+          'x-api-key'                               : s.apiKey,
+          'anthropic-version'                       : '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model     : CLAUDE_MODEL,
+          max_tokens: 1024,
+          stream    : true,
+          system    : buildSystemPrompt(),
+          messages  : chatHistory,
+        }),
+      });
+
+      if (!resp.ok) {
+        const errBody = await resp.json().catch(() => ({}));
+        throw new Error(errBody?.error?.message || `API error ${resp.status}`);
+      }
+
+      // Parse SSE stream
+      const reader  = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer    = '';
+      let fullText  = '';
+
+      // Clear thinking dots — ready to stream text in
+      thinkBubble.innerHTML = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // keep incomplete final line
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const payload = line.slice(6).trim();
+          if (payload === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(payload);
+            if (
+              parsed.type === 'content_block_delta' &&
+              parsed.delta?.type === 'text_delta'
+            ) {
+              fullText += parsed.delta.text;
+              thinkBubble.innerHTML = renderMarkdown(fullText);
+              scrollToBottom();
+            }
+          } catch { /* skip malformed chunks */ }
+        }
+      }
+
+      chatHistory.push({ role: 'assistant', content: fullText });
+
+    } catch (err) {
+      console.error('Claude API error:', err);
+      thinkBubble.innerHTML =
+        `<em style="color:var(--clr-accent)">⚠ ${err.message}</em>`;
+      // Roll back the user message so the history stays clean
+      chatHistory.pop();
+    } finally {
+      isStreaming = false;
+      $('sendBtn').disabled = false;
+      $('chatInput').focus();
+    }
+  }
+
+  // Send button
+  $('sendBtn').addEventListener('click', () => sendMessage($('chatInput').value));
+
+  // Enter → send  |  Shift+Enter → new line
+  $('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage($('chatInput').value);
+    }
+  });
+
+  // Auto-resize textarea
+  $('chatInput').addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+  });
+
+  // Starter prompt buttons
+  function attachStarterListeners(root) {
+    root.querySelectorAll('.chat-starter-btn').forEach(btn => {
+      btn.addEventListener('click', () => sendMessage(btn.dataset.prompt));
+    });
+  }
+  attachStarterListeners(document);
+
+  // Clear chat
+  $('clearChat').addEventListener('click', () => {
+    chatHistory = [];
+    $('chatMessages').innerHTML =
+      `<div class="chat-empty" id="chatEmpty">
+        <div class="chat-empty-title">What's on your training mind?</div>
+        <div>Your data + Claude = smart, personalised coaching.</div>
+        <div class="chat-starters" id="chatStarters">
+          <button class="chat-starter-btn" data-prompt="How is my training load looking this week?">Training load this week</button>
+          <button class="chat-starter-btn" data-prompt="Based on my recent activities, what should I focus on today?">What to do today</button>
+          <button class="chat-starter-btn" data-prompt="How is my race preparation going for Ironman Jacksonville?">Race prep check-in</button>
+          <button class="chat-starter-btn" data-prompt="Am I recovering well based on my HRV and sleep data?">Recovery check</button>
+        </div>
+      </div>`;
+    attachStarterListeners($('chatMessages'));
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  (async function init() {
+    loadSettingsUI();
+    loadGarminUI();
+    updateStatusBadges();
+
+    // Render dashboard from cache immediately (no flash)
+    updateDashboard();
+
+    // Handle Strava OAuth redirect callback
+    if (window.location.search.includes('code=')) {
+      await handleStravaCallback();
+    } else if (store.get('strava_token')) {
+      // Silently refresh Strava data in background
+      fetchStravaData();
+    }
+  })();
+
+  </script>
+</body>
+</html>
