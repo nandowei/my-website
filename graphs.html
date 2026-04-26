@@ -947,7 +947,7 @@
     const recScore  = baseline ? Math.min(25, (recentHRV/baseline)*25) : 12.5;
     const longScore = Math.min(15, (longRunMi>=tgt.longrun?7.5:longRunMi/tgt.longrun*7.5) + (longRideMi>=tgt.longride?7.5:longRideMi/tgt.longride*7.5));
     const score     = Math.round(volScore+conScore+recScore+longScore);
-    const badge     = score>=80?'Strong':'On Track':score>=60?'On Track':'Needs Attention';
+    const badge     = score>=80?'Strong':score>=60?'On Track':'Needs Attention';
     const badgeClr  = score>=80?'#5cb85c':score>=60?'#e8a838':'#d9534f';
 
     // Recommendations
@@ -1179,6 +1179,7 @@
       if (!resp.ok) throw new Error(`Strava error ${resp.status}`);
       const activities = await resp.json();
       store.set('strava_extended', { activities, cachedAt: Date.now() });
+      btn.disabled=false;
       updateDataBar();
       rerenderAll();
     } catch(err) {
